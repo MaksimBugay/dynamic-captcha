@@ -1,6 +1,5 @@
 package bmv.org.pushca.captcha.service;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedEpochGenerator;
 import java.nio.charset.StandardCharsets;
@@ -71,11 +70,11 @@ public class CaptchaService {
     return x1 * x2;
   }
 
-  public record ResultCaptcha(int result, @JsonIgnore byte[] image) {
+  public record ResultCaptcha(int result, byte[] image) {
 
   }
 
-  public record CaptchaSet(UUID id, int x1, int x2, @JsonIgnore byte[] captcha,
+  public record CaptchaSet(UUID id, int x1, int x2, byte[] captcha,
                            ResultCaptcha[] results,
                            int correctResultIndex) {
 
