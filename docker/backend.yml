@@ -1,0 +1,53 @@
+version: '3.8'
+
+services:
+  dynamic-captcha:
+    restart: unless-stopped
+    image: n7fr846yfa6ohlhe/mbugai:dynamic-captcha-${DEPLOY_VERSION:-1}
+    environment:
+      - 'spring.config.location=/conf/application.yaml'
+      - 'JVM_ARGS=-agentlib:jdwp=transport=dt_socket,address=8081,server=y,suspend=n'
+    ports:
+      - target: 8080
+        published: 8061
+        protocol: tcp
+    configs:
+      - source: dynamic-captcha-config
+        target: /conf/application.yaml
+    networks:
+      default:
+        aliases:
+          - dynamic-captcha-local
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "1m"
+        max-file: "10"
+    labels:
+      filebeats_log: "false"
+    deploy:
+      labels:
+        - traefik.enable=false
+      replicas: 1
+      #      resources:
+      #        limits:
+      #          cpus: '5'
+      #          memory: 16000M
+      #        reservations:
+      #          cpus: '3'
+      #          memory: 16000M
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 9999999
+        window: 90s
+
+networks:
+  default:
+    external: true
+    name: "pshc"
+
+configs:
+  dynamic-captcha-config:
+    name: dynamic-captcha-config-${CONFIG_VERSION:-0}
+    file: conf/application.yaml

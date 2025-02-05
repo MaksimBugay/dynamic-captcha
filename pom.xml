@@ -11,7 +11,7 @@
   </parent>
   <groupId>bmv.org.pushca</groupId>
   <artifactId>captcha</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.1</version>
   <name>dynamic-captcha</name>
   <description>Generate strong captcha to facilitate protection against bots</description>
   <url/>
