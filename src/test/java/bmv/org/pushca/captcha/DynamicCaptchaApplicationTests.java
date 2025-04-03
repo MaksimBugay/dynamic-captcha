@@ -9,11 +9,13 @@ import bmv.org.pushca.captcha.serialization.json.JsonUtility;
 import bmv.org.pushca.captcha.service.CaptchaService;
 import bmv.org.pushca.captcha.service.CaptchaService.CaptchaSet;
 import bmv.org.pushca.captcha.service.CaptchaService.CaptchaSetBinaries;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -110,5 +112,20 @@ class DynamicCaptchaApplicationTests {
       throw new RuntimeException(e);
     }
     System.out.println("File saved at: " + outputFile.getAbsolutePath());
+  }
+
+  public static void fileSystemCleanup() {
+    File directory = new File("captcha-set");
+    if (directory.exists() && directory.isDirectory()) {
+      for (File file : directory.listFiles()) {
+        if (file.isFile()) {
+          if (file.delete()) {
+            System.out.println("Deleted file: " + file.getName());
+          } else {
+            System.err.println("Failed to delete file: " + file.getName());
+          }
+        }
+      }
+    }
   }
 }
