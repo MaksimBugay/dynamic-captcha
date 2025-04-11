@@ -1,5 +1,7 @@
 package bmv.org.pushca.captcha;
 
+import static bmv.org.pushca.captcha.service.CaptchaGenerator.bufferedImageToBytes;
+import static bmv.org.pushca.captcha.service.CaptchaGenerator.bytesToBufferedImage;
 import static bmv.org.pushca.captcha.service.CaptchaService.CaptchaSet.toCaptchaSetBinaries;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -10,12 +12,14 @@ import bmv.org.pushca.captcha.service.CaptchaService;
 import bmv.org.pushca.captcha.service.CaptchaService.CaptchaSet;
 import bmv.org.pushca.captcha.service.CaptchaService.CaptchaSetBinaries;
 
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
+import bmv.org.pushca.captcha.service.PuzzleCaptchaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +44,9 @@ class DynamicCaptchaApplicationTests {
 
   @Autowired
   private CaptchaService captchaService;
+
+  @Autowired
+  private PuzzleCaptchaService puzzleCaptchaService;
 
   protected WebTestClient client;
 
@@ -84,6 +91,39 @@ class DynamicCaptchaApplicationTests {
     String json = JsonUtility.toJson(captchaSet);
     captchaSet = JsonUtility.fromJson(json, CaptchaSet.class);
     processCaptchaSet(captchaSet);
+  }
+
+  @Test
+  void puzzleCaptchaSetBinariesWebTest() {
+    client.get()
+        .uri("/dynamic-puzzle-captcha/generate-and-get?grid-size=3&piece-side-length=200&apply-noise=true")
+        .exchange()
+        .expectStatus().isOk()
+        .expectBody(PuzzleCaptchaService.PuzzleCaptchaSet.class)
+        .value(captchaSet -> {
+          assertNotNull(captchaSet);
+          fileSystemCleanup();
+          saveBytesToFile(
+              captchaSet.puzzleImage(),
+              "full_puzzle_board" + ".png"
+          );
+
+          saveBytesToFile(
+              captchaSet.correctOptionImage(),
+              "correct_option" + ".png"
+          );
+          BufferedImage gridWithSelection = puzzleCaptchaService.getGenerator().drawDashedRectangleOnGridImage(
+              bytesToBufferedImage(captchaSet.puzzleImage()),
+              captchaSet.correctOptionRectangle()
+          );
+          BufferedImage gridWithTwoSelections = puzzleCaptchaService.getGenerator().drawDashedRectangleOnGridImage(
+              gridWithSelection, captchaSet.targetRectangle()
+          );
+          saveBytesToFile(
+              bufferedImageToBytes(gridWithTwoSelections, "png"),
+              "puzzle_options_grid_with_selection" + ".png"
+          );
+        });
   }
 
   private static void processCaptchaSet(CaptchaSet captchaSet) {
