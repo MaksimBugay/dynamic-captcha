@@ -34,7 +34,6 @@ public class ComplexPuzzleImageGenerator {
       // Draw complex puzzle grid
       int squareSize = squareSideLength / gridSize; // Dynamic grid size
       double maxDistance = -1;
-      int maxPieceCenterX = 0, maxPieceCenterY = 0;
       maxPieceCellAddress = new GridCellAddress(0, 0);
 
       for (int i = 0; i < gridSize; i++) {
@@ -60,8 +59,6 @@ public class ComplexPuzzleImageGenerator {
           // Check if this is the maximum distance
           if (distance > maxDistance) {
             maxDistance = distance;
-            maxPieceCenterX = pieceCenterX;
-            maxPieceCenterY = pieceCenterY;
             maxPieceCellAddress = new GridCellAddress(i, j);
           }
 
@@ -286,7 +283,209 @@ public class ComplexPuzzleImageGenerator {
     return outputImage;
   }
 
-  public PuzzleTaskFullData concatenateImagesIntoGrid(PuzzleTaskData puzzleTaskData) {
+
+
+  public BufferedImage rotateImageRandomly(BufferedImage inputImage) {
+    // Generate random angle between 15 and 175 degrees
+    double angle = 15 + random.nextDouble() * (175 - 15);
+    double radians = Math.toRadians(angle);
+
+    // Calculate dimensions for the rotated image
+    double sin = Math.abs(Math.sin(radians));
+    double cos = Math.abs(Math.cos(radians));
+
+    int originalWidth = inputImage.getWidth();
+    int originalHeight = inputImage.getHeight();
+
+    int newWidth = (int) Math.floor(originalWidth * cos + originalHeight * sin);
+    int newHeight = (int) Math.floor(originalHeight * cos + originalWidth * sin);
+
+    // Create new image with calculated dimensions
+    BufferedImage rotatedImage = new BufferedImage(newWidth, newHeight, inputImage.getType());
+    Graphics2D graphics = null;
+
+    try {
+      graphics = rotatedImage.createGraphics();
+
+      // Fill with transparent background
+      graphics.setColor(new Color(0, 0, 0, 0));
+      graphics.fillRect(0, 0, newWidth, newHeight);
+
+      // Set rendering hints for better quality
+      graphics.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,
+                               java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+      graphics.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING,
+                               java.awt.RenderingHints.VALUE_RENDER_QUALITY);
+      graphics.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                               java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+
+      // Translate to center, rotate, then translate back
+      graphics.translate(newWidth / 2, newHeight / 2);
+      graphics.rotate(radians);
+      graphics.translate(-originalWidth / 2, -originalHeight / 2);
+
+      // Draw the original image
+      graphics.drawImage(inputImage, 0, 0, null);
+
+    } finally {
+      if (graphics != null) {
+        graphics.dispose();
+      }
+    }
+
+    return rotatedImage;
+  }
+
+  public BufferedImage addRandomTransparentHoles(BufferedImage inputImage) {
+    // No dashing noise - return image unchanged
+    return inputImage;
+  }
+
+
+
+  public BufferedImage addColorMatchingNoise(BufferedImage inputImage, int gridSize) {
+    int width = inputImage.getWidth();
+    int height = inputImage.getHeight();
+    BufferedImage noisyImage = new BufferedImage(width, height, inputImage.getType());
+    Graphics2D graphics = null;
+
+    try {
+      graphics = noisyImage.createGraphics();
+
+      // Draw the original image first
+      graphics.drawImage(inputImage, 0, 0, null);
+
+      // Set rendering hints for smooth lines
+      graphics.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                               java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+      graphics.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING,
+                               java.awt.RenderingHints.VALUE_RENDER_QUALITY);
+
+      // Sample colors from the transformed image to match the color transformation
+      Color[] sampleColors = sampleColorsFromImage(inputImage, 10);
+
+      // No noise lines
+      int numberOfNoiseElements = 0;
+
+      for (int i = 0; i < numberOfNoiseElements; i++) {
+        // Choose random color from sampled colors
+        Color noiseColor = sampleColors[random.nextInt(sampleColors.length)];
+
+        // Add some transparency to make noise subtle
+        Color transparentNoiseColor = new Color(
+            noiseColor.getRed(),
+            noiseColor.getGreen(),
+            noiseColor.getBlue(),
+            80 + random.nextInt(100) // Alpha between 80-179 for partial transparency
+        );
+
+        graphics.setColor(transparentNoiseColor);
+
+        // Use same line thickness as puzzle pieces (1 pixel default stroke)
+        float lineWidth = 1.0f;
+
+        // Set solid stroke (dashing will happen later in final stage)
+        graphics.setStroke(new BasicStroke(lineWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // Generate puzzle piece shape that avoids puzzle piece content
+        drawNoisePuzzlePiece(graphics, inputImage, width, height, transparentNoiseColor);
+      }
+
+    } finally {
+      if (graphics != null) {
+        graphics.dispose();
+      }
+    }
+
+    return noisyImage;
+  }
+
+  private Color[] sampleColorsFromImage(BufferedImage image, int sampleCount) {
+    Color[] colors = new Color[sampleCount];
+    int width = image.getWidth();
+    int height = image.getHeight();
+
+    for (int i = 0; i < sampleCount; i++) {
+      int x = random.nextInt(width);
+      int y = random.nextInt(height);
+      int rgb = image.getRGB(x, y);
+      colors[i] = new Color(rgb, true);
+    }
+
+    return colors;
+  }
+
+  private void drawNoisePuzzlePiece(Graphics2D graphics, BufferedImage image, int imageWidth, int imageHeight, Color outlineColor) {
+    // Try multiple times to find a good position that doesn't heavily overlap puzzle piece
+    for (int attempt = 0; attempt < 10; attempt++) {
+      // Random position and size for puzzle piece noise
+      int x = random.nextInt(imageWidth - 50);
+      int y = random.nextInt(imageHeight - 50);
+      int size = 20 + random.nextInt(30); // 20-49 pixels size
+
+      // Check if this area has too much puzzle piece content
+      if (hasTooMuchPuzzleContent(image, x + size/2, y + size/2, size, size)) {
+        continue; // Try another position
+      }
+
+      // Draw each side with different random colors (multicolored line)
+      int offset = size / 7; // Same offset calculation as puzzle pieces
+      Path2D topSide = new Path2D.Double();
+      topSide.moveTo(x + random.nextInt(offset) - offset / 2.0, y + random.nextInt(offset) - offset / 2.0);
+      drawRandomEdge(topSide, x, y, x + size, y, true);
+      graphics.setColor(new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256))); // Random color
+      graphics.draw(topSide);
+
+      Path2D rightSide = new Path2D.Double();
+      rightSide.moveTo(x + size, y);
+      drawRandomEdge(rightSide, x + size, y, x + size, y + size, true);
+      graphics.setColor(new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256))); // Random color
+      graphics.draw(rightSide);
+
+      Path2D bottomSide = new Path2D.Double();
+      bottomSide.moveTo(x + size, y + size);
+      drawRandomEdge(bottomSide, x + size, y + size, x, y + size, true);
+      graphics.setColor(new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256))); // Random color
+      graphics.draw(bottomSide);
+
+      Path2D leftSide = new Path2D.Double();
+      leftSide.moveTo(x, y + size);
+      drawRandomEdge(leftSide, x, y + size, x, y, true);
+      graphics.setColor(new Color(random.nextInt(256), random.nextInt(256), random.nextInt(256))); // Random color
+      graphics.draw(leftSide);
+
+      return; // Successfully drew a multicolored noise puzzle piece, exit
+    }
+  }
+
+  private boolean hasTooMuchPuzzleContent(BufferedImage image, int centerX, int centerY, int sizeX, int sizeY) {
+    int totalPixels = 0;
+    int puzzlePixels = 0;
+
+    // Check area around the noise line position - make area bigger to be more strict
+    int checkX1 = Math.max(0, centerX - sizeX);
+    int checkY1 = Math.max(0, centerY - sizeY);
+    int checkX2 = Math.min(image.getWidth() - 1, centerX + sizeX);
+    int checkY2 = Math.min(image.getHeight() - 1, centerY + sizeY);
+
+    // Sample every pixel for accurate detection
+    for (int y = checkY1; y <= checkY2; y += 2) { // Sample every 2nd pixel
+      for (int x = checkX1; x <= checkX2; x += 2) {
+        totalPixels++;
+        Color pixel = new Color(image.getRGB(x, y), true);
+
+        // Much stricter detection: any pixel with alpha > 30 is considered puzzle content
+        if (pixel.getAlpha() > 30) {
+          puzzlePixels++;
+        }
+      }
+    }
+
+    // Zero tolerance: reject if ANY puzzle content is found
+    return puzzlePixels > 0;
+  }
+
+  public PuzzleTaskFullData concatenateImagesIntoGrid(PuzzleTaskData puzzleTaskData, boolean applyNoise) {
     PuzzleImage[] images = puzzleTaskData.images();
     if (images == null || images.length == 0) {
       throw new IllegalArgumentException("Images array cannot be null or empty.");
@@ -339,11 +538,81 @@ public class ComplexPuzzleImageGenerator {
           GridCellAddress address = new GridCellAddress(col, row);
           BufferedImage image = imageMap.get(address);
           if (image != null) {
-            // Draw the image at the specified position
-            graphics.drawImage(image, currentX, currentY, null);
+            // Random scale coefficient: 1.1 to 1.4 (all pieces enlarged)
+            double scaleCoefficient = 1.1 + random.nextDouble() * 0.3; // 1.1 to 1.4
 
-            // Create a Rectangle representing the position and size of the embedded image
-            Rectangle rectangle = new Rectangle(new Point(currentX, currentY), image.getWidth(), image.getHeight());
+            int finalWidth, finalHeight, drawX, drawY;
+
+            if (applyNoise) {
+              // Apply both scaling and rotation when noise is enabled
+
+              // Random rotation angle: 15 to 165 degrees
+              double rotationAngle = 15 + random.nextDouble() * 150; // 15 to 165 degrees
+              double rotationRadians = Math.toRadians(rotationAngle);
+
+              // Calculate rotated and scaled dimensions
+              double sin = Math.abs(Math.sin(rotationRadians));
+              double cos = Math.abs(Math.cos(rotationRadians));
+              int originalWidth = (int) (image.getWidth() * scaleCoefficient);
+              int originalHeight = (int) (image.getHeight() * scaleCoefficient);
+
+              finalWidth = (int) Math.floor(originalWidth * cos + originalHeight * sin);
+              finalHeight = (int) Math.floor(originalHeight * cos + originalWidth * sin);
+
+              // Center the rotated and scaled image within the original cell area
+              int offsetX = (columnWidths[col] - finalWidth) / 2;
+              int offsetY = (rowHeights[row] - finalHeight) / 2;
+              drawX = currentX + offsetX;
+              drawY = currentY + offsetY;
+
+              // Create rotated and scaled image
+              BufferedImage rotatedScaledImage = new BufferedImage(finalWidth, finalHeight, image.getType());
+              Graphics2D g2d = rotatedScaledImage.createGraphics();
+              try {
+                // Set rendering hints for quality
+                g2d.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,
+                                     java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g2d.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING,
+                                     java.awt.RenderingHints.VALUE_RENDER_QUALITY);
+                g2d.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+                                     java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+
+                // Fill with transparent background
+                g2d.setColor(new Color(0, 0, 0, 0));
+                g2d.fillRect(0, 0, finalWidth, finalHeight);
+
+                // Apply rotation and scaling
+                g2d.translate(finalWidth / 2, finalHeight / 2);
+                g2d.rotate(rotationRadians);
+                g2d.scale(scaleCoefficient, scaleCoefficient);
+                g2d.translate(-image.getWidth() / 2, -image.getHeight() / 2);
+
+                // Draw the original image
+                g2d.drawImage(image, 0, 0, null);
+              } finally {
+                g2d.dispose();
+              }
+
+              // Draw the rotated and scaled image
+              graphics.drawImage(rotatedScaledImage, drawX, drawY, null);
+            } else {
+              // Apply only scaling when noise is disabled
+
+              finalWidth = (int) (image.getWidth() * scaleCoefficient);
+              finalHeight = (int) (image.getHeight() * scaleCoefficient);
+
+              // Center the scaled image within the original cell area
+              int offsetX = (columnWidths[col] - finalWidth) / 2;
+              int offsetY = (rowHeights[row] - finalHeight) / 2;
+              drawX = currentX + offsetX;
+              drawY = currentY + offsetY;
+
+              // Draw the scaled image without rotation
+              graphics.drawImage(image, drawX, drawY, finalWidth, finalHeight, null);
+            }
+
+            // Create a Rectangle representing the position and size of the transformed image
+            Rectangle rectangle = new Rectangle(new Point(drawX, drawY), finalWidth, finalHeight);
 
             // Create a PuzzleArea object
             puzzleAreas[col * (maxCellY + 1) + row] = new PuzzleArea(
@@ -387,9 +656,9 @@ public class ComplexPuzzleImageGenerator {
     return gridImage;
   }
 
-  public PuzzleTaskFullData concatenateSelectedCellWithGrid(PuzzleTaskData puzzleTaskData) {
+  public PuzzleTaskFullData concatenateSelectedCellWithGrid(PuzzleTaskData puzzleTaskData, int gridSize, boolean applyNoise) {
     PuzzleImage puzzleImage = puzzleTaskData.getSelectedCellImage();
-    PuzzleTaskFullData fullData = concatenateImagesIntoGrid(puzzleTaskData);
+    PuzzleTaskFullData fullData = concatenateImagesIntoGrid(puzzleTaskData, applyNoise);
     if (fullData == null || puzzleImage == null) {
       throw new IllegalArgumentException("PuzzleTaskFullData and image cannot be null.");
     }
@@ -397,7 +666,9 @@ public class ComplexPuzzleImageGenerator {
     // Align the width of the image with the width of the puzzle grid image
     int gridWidth = fullData.puzzleGridImage().getWidth();
     PuzzlePiece puzzlePieceWithMargins = addRandomMargins(puzzleImage.image, gridWidth);
-    BufferedImage imageWithMargins = applyRandomColorTransformation(puzzlePieceWithMargins.image());
+    BufferedImage imageWithColorTransformation = applyRandomColorTransformation(puzzlePieceWithMargins.image());
+    BufferedImage imageWithNoise = addColorMatchingNoise(imageWithColorTransformation, gridSize);
+    BufferedImage imageWithMargins = addRandomTransparentHoles(imageWithNoise);
 
     PuzzleArea target = new PuzzleArea(
         new Rectangle(puzzlePieceWithMargins.leftTopCorner(), puzzleImage.image().getWidth(), puzzleImage.image().getHeight()),
@@ -462,7 +733,9 @@ public class ComplexPuzzleImageGenerator {
             applyNoise,
             false,
             false
-        )
+        ),
+        gridSize,
+        applyNoise
     );
   }
 
