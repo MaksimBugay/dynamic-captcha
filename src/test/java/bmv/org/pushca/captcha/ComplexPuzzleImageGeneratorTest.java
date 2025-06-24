@@ -28,7 +28,8 @@ public class ComplexPuzzleImageGeneratorTest {
         "correct_option" + ".png"
     );
     BufferedImage gridWithSelection = generator.drawDashedRectangleOnGridImage(fullData.puzzleGridImage(), fullData.getCorrectOption().rectangle());
-    fullData = new PuzzleTaskFullData(fullData.options(), fullData.target(), gridWithSelection);
+    fullData = new PuzzleTaskFullData(fullData.options(), fullData.target(), gridWithSelection,
+        fullData.scaleCoefficient());
 
     BufferedImage gridWithTwoSelections = generator.drawDashedRectangleOnGridImage(fullData.puzzleGridImage(), fullData.target().rectangle());
     saveBytesToFile(
