@@ -8,15 +8,8 @@ import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.drawDashedRe
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 
-import bmv.org.pushca.captcha.service.ComplexPuzzleImageGenerator;
 import bmv.org.pushca.captcha.service.NewPuzzleImageGenerator;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.ObfuscatedPuzzlePiece;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Point;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleGrid;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzlePiece;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleTaskFullData;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Rectangle;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.SimplePuzzlePiece;
 
 public class ComplexPuzzleImageGeneratorTest {
