@@ -3,6 +3,7 @@ package bmv.org.pushca.captcha;
 import static bmv.org.pushca.captcha.service.CaptchaGenerator.bufferedImageToBytes;
 import static bmv.org.pushca.captcha.service.CaptchaGenerator.bytesToBufferedImage;
 import static bmv.org.pushca.captcha.service.CaptchaService.CaptchaSet.toCaptchaSetBinaries;
+import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.drawDashedRectangleOnGridImage;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
@@ -112,11 +113,11 @@ class DynamicCaptchaApplicationTests {
               captchaSet.correctOptionImage(),
               "correct_option" + ".png"
           );
-          BufferedImage gridWithSelection = puzzleCaptchaService.getGenerator().drawDashedRectangleOnGridImage(
+          BufferedImage gridWithSelection = drawDashedRectangleOnGridImage(
               bytesToBufferedImage(captchaSet.puzzleImage()),
               captchaSet.correctOptionRectangle()
           );
-          BufferedImage gridWithTwoSelections = puzzleCaptchaService.getGenerator().drawDashedRectangleOnGridImage(
+          BufferedImage gridWithTwoSelections = drawDashedRectangleOnGridImage(
               gridWithSelection, captchaSet.targetRectangle()
           );
           saveBytesToFile(

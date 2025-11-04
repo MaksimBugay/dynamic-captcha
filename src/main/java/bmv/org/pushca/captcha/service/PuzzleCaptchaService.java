@@ -2,11 +2,11 @@ package bmv.org.pushca.captcha.service;
 
 import static bmv.org.pushca.captcha.service.CaptchaGenerator.bufferedImageToBytes;
 import static bmv.org.pushca.captcha.service.CaptchaService.ID_GENERATOR;
-import static bmv.org.pushca.captcha.service.ComplexPuzzleImageGenerator.PuzzleTaskFullData;
-import static bmv.org.pushca.captcha.service.ComplexPuzzleImageGenerator.Rectangle;
 
 import java.util.UUID;
 
+import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleTaskFullData;
+import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Rectangle;
 import org.springframework.stereotype.Service;
 
 @Service
