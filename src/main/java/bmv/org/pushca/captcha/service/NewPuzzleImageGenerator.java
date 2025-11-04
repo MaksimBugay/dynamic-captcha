@@ -3,7 +3,9 @@ package bmv.org.pushca.captcha.service;
 import static bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleArea;
 import static bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleTaskFullData;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomAngle;
+import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomScaleCoefficient;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.rotateImage;
+import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.scaleImage;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -329,15 +331,19 @@ public class NewPuzzleImageGenerator {
     validateObfuscationInputs(puzzlePiece, squareSideLength);
 
     double rotationAngle;
+    double scaleCoefficient;
     BufferedImage originalImage;
 
     if (withTransformation) {
       rotationAngle = generateRandomAngle();
-      originalImage = rotateImage(puzzlePiece.image(), rotationAngle);
+      scaleCoefficient = generateRandomScaleCoefficient();
+      BufferedImage tmpImage = rotateImage(puzzlePiece.image(), rotationAngle);
+      originalImage = scaleImage(tmpImage, scaleCoefficient);
     } else {
       rotationAngle = 0;
       originalImage = puzzlePiece.image();
     }
+    //scale down
     ImageDimensions imageDimensions = extractImageDimensions(originalImage);
 
     MarginOffsets marginOffsets = calculateMarginOffsets(

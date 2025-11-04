@@ -14,7 +14,7 @@ public class PuzzleImageGeneratorUtils {
   /**
    * Rotates a BufferedImage by the specified angle while maintaining the shape.
    * The rotated image dimensions are calculated to fit the entire rotated content.
-   * 
+   *
    * @param inputImage The image to rotate
    * @param angle      The rotation angle in degrees, or null to use a random angle (15-195 degrees)
    * @return A new BufferedImage with the rotated content
@@ -67,11 +67,75 @@ public class PuzzleImageGeneratorUtils {
     return rotatedImage;
   }
 
+  /**
+   * Generates a random rotation angle between 15 and 195 degrees.
+   * Used for random puzzle piece rotations to increase visual variation.
+   *
+   * @return A random angle in degrees between 15 and 195
+   */
   public static double generateRandomAngle() {
     return 15 + CaptchaGenerator.RANDOM.nextDouble() * 180;
   }
 
+  /**
+   * Scales down a BufferedImage by the given scale coefficient.
+   * If no coefficient is provided, a random scale factor between 0.6 and 0.9 is used.
+   *
+   * <p>Algorithm:
+   * <ul>
+   *   <li>If scaleCoefficient is null: generates random value in range [0.6, 0.9]</li>
+   *   <li>Delegates to {@link #scaleBufferedImage(BufferedImage, double)} for actual scaling</li>
+   *   <li>Maintains image quality with high-quality rendering hints</li>
+   * </ul>
+   *
+   * @param inputImage       The image to scale down
+   * @param scaleCoefficient The scale factor (1.0 = original, 0.5 = half size), or null for random (0.6-0.9)
+   * @return A new scaled-down BufferedImage
+   * @throws IllegalArgumentException if inputImage is null or has invalid dimensions
+   */
+  public static BufferedImage scaleImage(BufferedImage inputImage, Double scaleCoefficient) {
+    validateImageInput(inputImage);
+
+    // Use provided coefficient or generate random value between 0.6 and 0.9
+    double coefficient = (scaleCoefficient != null) ? scaleCoefficient : generateRandomScaleCoefficient();
+
+    return scaleBufferedImage(inputImage, coefficient);
+  }
+
+  /**
+   * Generates a random scale coefficient between 0.6 and 0.9 for downscaling.
+   * Ensures the image is always reduced by 10-40% of its original size.
+   *
+   * @return A random scale factor in range [0.6, 0.9]
+   */
+  public static double generateRandomScaleCoefficient() {
+    // 0.3 = 0.9 - 0.6, gives range [0.6, 0.9]
+    return 0.6 + CaptchaGenerator.RANDOM.nextDouble() * 0.3;
+  }
+
+  /**
+   * Draws a dashed red rectangle on a grid image to highlight a specific area.
+   * Used for visual debugging and highlighting the matched puzzle piece area.
+   *
+   * <p>Details:
+   * <ul>
+   *   <li>Dash pattern: 10 pixels on, 10 pixels off</li>
+   *   <li>Stroke width: 2 pixels</li>
+   *   <li>Color: Red (for visibility)</li>
+   * </ul>
+   *
+   * @param gridImage The grid image to draw on
+   * @param rectangle The rectangle to draw (position and dimensions)
+   * @return The modified grid image with the dashed rectangle drawn
+   * @throws IllegalArgumentException if gridImage is null or rectangle is null
+   */
   public static BufferedImage drawDashedRectangleOnGridImage(BufferedImage gridImage, PuzzleImageGeneratorTypes.Rectangle rectangle) {
+    if (gridImage == null) {
+      throw new IllegalArgumentException("Grid image cannot be null");
+    }
+    if (rectangle == null) {
+      throw new IllegalArgumentException("Rectangle cannot be null");
+    }
     Graphics2D graphics = null;
 
     try {
@@ -136,4 +200,12 @@ public class PuzzleImageGeneratorUtils {
     return graphics;
   }
 
+  private static void validateImageInput(BufferedImage inputImage) {
+    if (inputImage == null) {
+      throw new IllegalArgumentException("Input image cannot be null");
+    }
+    if (inputImage.getWidth() <= 0 || inputImage.getHeight() <= 0) {
+      throw new IllegalArgumentException("Input image must have positive dimensions");
+    }
+  }
 }
