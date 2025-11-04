@@ -19,7 +19,7 @@ public class ComplexPuzzleImageGeneratorTest {
     //ComplexPuzzleImageGenerator generator = new ComplexPuzzleImageGenerator();
     NewPuzzleImageGenerator generator = new NewPuzzleImageGenerator();
     int gridSize = 3; // Example grid size
-    int squareSideLength = 400;
+    //int squareSideLength = 400;
 
     for (int i = 0; i < 10; i++) {
       SimplePuzzlePiece puzzlePiece = generator.drawComplexPuzzlePiece(90, Color.BLUE);
@@ -39,7 +39,7 @@ public class ComplexPuzzleImageGeneratorTest {
 
       PuzzleGrid puzzleGrid1 = generator.drawPuzzleGrid(
           puzzlePiece,
-          3,
+          gridSize,
           200,
           Color.BLUE,
           true
@@ -61,7 +61,7 @@ public class ComplexPuzzleImageGeneratorTest {
 
       PuzzleGrid puzzleGrid2 = generator.drawPuzzleGrid(
           puzzlePiece,
-          3,
+          gridSize,
           200,
           Color.BLUE,
           false
