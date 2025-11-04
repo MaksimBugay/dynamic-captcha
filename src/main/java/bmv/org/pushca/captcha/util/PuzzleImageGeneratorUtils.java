@@ -44,15 +44,7 @@ public class PuzzleImageGeneratorUtils {
     Graphics2D graphics = null;
 
     try {
-      graphics = rotatedImage.createGraphics();
-
-      // Set rendering hints for quality
-      graphics.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,
-          java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-      graphics.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING,
-          java.awt.RenderingHints.VALUE_RENDER_QUALITY);
-      graphics.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
-          java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+      graphics = getGraphics2D(rotatedImage);
 
       // Fill with transparent background
       graphics.setColor(new Color(0, 0, 0, 0));
@@ -120,13 +112,7 @@ public class PuzzleImageGeneratorUtils {
     Graphics2D graphics = null;
 
     try {
-      graphics = scaledImage.createGraphics();
-      graphics.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,
-          java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-      graphics.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING,
-          java.awt.RenderingHints.VALUE_RENDER_QUALITY);
-      graphics.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
-          java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+      graphics = getGraphics2D(scaledImage);
 
       graphics.drawImage(inputImage, 0, 0, newWidth, newHeight, null);
     } finally {
@@ -136,6 +122,18 @@ public class PuzzleImageGeneratorUtils {
     }
 
     return scaledImage;
+  }
+
+  private static Graphics2D getGraphics2D(BufferedImage scaledImage) {
+    Graphics2D graphics;
+    graphics = scaledImage.createGraphics();
+    graphics.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,
+        java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+    graphics.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING,
+        java.awt.RenderingHints.VALUE_RENDER_QUALITY);
+    graphics.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
+        java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+    return graphics;
   }
 
 }
