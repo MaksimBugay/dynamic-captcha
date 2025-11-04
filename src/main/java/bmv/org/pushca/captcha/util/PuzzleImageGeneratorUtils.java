@@ -15,6 +15,10 @@ import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes;
 public class PuzzleImageGeneratorUtils {
 
 
+  public static boolean generateRandomBoolean() {
+    return CaptchaGenerator.RANDOM.nextBoolean();
+  }
+
   /**
    * Rotates a BufferedImage by the specified angle while maintaining the shape.
    * The rotated image dimensions are calculated to fit the entire rotated content.

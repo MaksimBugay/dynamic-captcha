@@ -3,6 +3,7 @@ package bmv.org.pushca.captcha.service;
 import static bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleArea;
 import static bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleTaskFullData;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomAngle;
+import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomBoolean;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomScaleCoefficient;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.rotateImage;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.scaleImage;
@@ -126,7 +127,7 @@ public class NewPuzzleImageGenerator {
               puzzlePiece.area().width(),
               cellSize,
               color,
-              topGrid
+              generateRandomBoolean()
           );
         }
       }
