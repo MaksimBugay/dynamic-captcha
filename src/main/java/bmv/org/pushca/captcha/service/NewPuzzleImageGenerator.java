@@ -249,24 +249,7 @@ public class NewPuzzleImageGenerator {
 
           // If this is the matched piece, update its origin rectangle with proportional coordinates
           if (piece == matchedPiece) {
-            Rectangle originalRectangle = piece.origin().area();
-
-            // Update position: offset the original top-left corner by the cell position in the grid
-            int updatedLeftTopX = drawX + originalRectangle.leftTopCorner().x();
-            int updatedLeftTopY = drawY + originalRectangle.leftTopCorner().y();
-
-            // Preserve original width and height
-            int updatedWidth = originalRectangle.width();
-            int updatedHeight = originalRectangle.height();
-
-            // Create the updated origin rectangle with new position but original dimensions
-            Rectangle updatedRectangle = new Rectangle(
-                new Point(updatedLeftTopX, updatedLeftTopY),
-                updatedWidth,
-                updatedHeight
-            );
-
-            SimplePuzzlePiece updatedOrigin = new SimplePuzzlePiece(updatedRectangle, piece.origin().image());
+            SimplePuzzlePiece updatedOrigin = updateAreaOfMatchedPuzzlePiece(piece, drawX, drawY);
             matchedPieceWithUpdatedOrigin = new ObfuscatedPuzzlePiece(
                 updatedOrigin,
                 piece.rotateAngle(),
@@ -283,6 +266,27 @@ public class NewPuzzleImageGenerator {
     }
 
     return matchedPieceWithUpdatedOrigin;
+  }
+
+  private static SimplePuzzlePiece updateAreaOfMatchedPuzzlePiece(ObfuscatedPuzzlePiece piece, int drawX, int drawY) {
+    Rectangle originalRectangle = piece.origin().area();
+
+    // Update position: offset the original top-left corner by the cell position in the grid
+    int updatedLeftTopX = drawX + originalRectangle.leftTopCorner().x();
+    int updatedLeftTopY = drawY + originalRectangle.leftTopCorner().y();
+
+    // Preserve original width and height
+    int updatedWidth = originalRectangle.width();
+    int updatedHeight = originalRectangle.height();
+
+    // Create the updated origin rectangle with new position but original dimensions
+    Rectangle updatedRectangle = new Rectangle(
+        new Point(updatedLeftTopX, updatedLeftTopY),
+        updatedWidth,
+        updatedHeight
+    );
+
+    return new SimplePuzzlePiece(updatedRectangle, piece.origin().image());
   }
 
   /**
