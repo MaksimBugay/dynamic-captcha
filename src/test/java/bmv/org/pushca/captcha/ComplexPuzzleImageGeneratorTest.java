@@ -13,6 +13,7 @@ import bmv.org.pushca.captcha.service.NewPuzzleImageGenerator;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.ObfuscatedPuzzlePiece;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Point;
+import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleGrid;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzlePiece;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleTaskFullData;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Rectangle;
@@ -37,12 +38,26 @@ public class ComplexPuzzleImageGeneratorTest {
           "full_puzzle_board" + ".png"
       );
 
-      BufferedImage puzzlePieceWithMarkedOrigin = drawDashedRectangleOnGridImage(obfuscatedPuzzlePiece.image(), obfuscatedPuzzlePiece.origin().area());
+      /*BufferedImage puzzlePieceWithMarkedOrigin = drawDashedRectangleOnGridImage(obfuscatedPuzzlePiece.image(), obfuscatedPuzzlePiece.origin().area());
       BufferedImage puzzlePieceWithMarkedOriginWithBorders = drawDashedRectangleOnGridImage(
           puzzlePieceWithMarkedOrigin, new Rectangle(new Point(0, 0), obfuscatedPuzzlePiece.image().getWidth(), obfuscatedPuzzlePiece.image().getHeight()));
       saveBytesToFile(
           bufferedImageToBytes(puzzlePieceWithMarkedOriginWithBorders, "png"),
           "puzzle_piece_with_selection" + ".png"
+      );*/
+
+      PuzzleGrid puzzleGrid = generator.drawPuzzleGrid(
+          obfuscatedPuzzlePiece,
+          3,
+          Color.BLUE
+      );
+      BufferedImage puzzleGridWithMarkedOrigin = drawDashedRectangleOnGridImage(
+          puzzleGrid.image(),
+          puzzleGrid.matchedPiece().origin().area()
+      );
+      saveBytesToFile(
+          bufferedImageToBytes(puzzleGridWithMarkedOrigin, "png"),
+          "puzzle_grid" + ".png"
       );
       try {
         Thread.sleep(2000);

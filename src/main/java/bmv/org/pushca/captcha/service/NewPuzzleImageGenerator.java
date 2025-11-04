@@ -14,6 +14,7 @@ import java.awt.image.BufferedImage;
 
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.ObfuscatedPuzzlePiece;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Point;
+import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleGrid;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Rectangle;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.SimplePuzzlePiece;
 
@@ -72,6 +73,216 @@ public class NewPuzzleImageGenerator {
     return new PuzzleTaskFullData(
         new PuzzleArea[0], null, null, null
     );
+  }
+
+  /**
+   * Generates a puzzle grid by combining a provided obfuscated puzzle piece with randomly generated pieces.
+   *
+   * <p>Grid Composition Algorithm:
+   * <ul>
+   *   <li>Creates a gridSize × gridSize matrix of puzzle pieces</li>
+   *   <li>Generates gridSize² - 1 random obfuscated pieces to fill the grid</li>
+   *   <li>Places the provided piece at a random cell position in the grid</li>
+   *   <li>Combines all pieces into a single BufferedImage</li>
+   *   <li>Updates the provided piece's origin rectangle to reflect its position in the grid</li>
+   * </ul>
+   *
+   * <p>Origin Rectangle Update:
+   * <ul>
+   *   <li>Preserves original width and height from the provided piece</li>
+   *   <li>Updates the top-left corner by offsetting with the grid cell position</li>
+   *   <li>Formula: newX = gridCellX + originalX, newY = gridCellY + originalY</li>
+   * </ul>
+   *
+   * @param obfuscatedPuzzlePiece The obfuscated puzzle piece to include in the grid
+   * @param gridSize              The grid dimensions (gridSize × gridSize)
+   * @param color                 The color used for drawing randomly generated pieces
+   * @return PuzzleGrid containing the matched piece with updated coordinates and the combined grid image
+   * @throws IllegalArgumentException if obfuscatedPuzzlePiece is null or gridSize <= 0
+   */
+  public PuzzleGrid drawPuzzleGrid(ObfuscatedPuzzlePiece obfuscatedPuzzlePiece, int gridSize, Color color) {
+    validateGridInputs(obfuscatedPuzzlePiece, gridSize);
+
+    // Get dimensions from the provided obfuscated piece
+    int cellWidth = obfuscatedPuzzlePiece.image().getWidth();
+    int cellHeight = obfuscatedPuzzlePiece.image().getHeight();
+
+    // Create grid to hold all pieces
+    ObfuscatedPuzzlePiece[][] grid = new ObfuscatedPuzzlePiece[gridSize][gridSize];
+    // Place the provided piece at a random position
+    int selectedCellX = CaptchaGenerator.RANDOM.nextInt(gridSize);
+    int selectedCellY = CaptchaGenerator.RANDOM.nextInt(gridSize);
+    grid[selectedCellY][selectedCellX] = obfuscatedPuzzlePiece;
+
+    // Add generated pieces to grid
+    for (int row = 0; row < gridSize; row++) {
+      for (int col = 0; col < gridSize; col++) {
+        if (grid[row][col] == null) {
+          grid[row][col] = generateRandomPuzzlePiece(
+              obfuscatedPuzzlePiece.origin().area().width(),
+              obfuscatedPuzzlePiece.image().getWidth(),
+              color
+          );
+        }
+      }
+    }
+
+    // Create combined grid image
+    int gridImageWidth = gridSize * cellWidth;
+    int gridImageHeight = gridSize * cellHeight;
+    BufferedImage gridImage = createTransparentImage(gridImageWidth, gridImageHeight);
+
+    // Update origin rectangle with proportional coordinates and draw pieces onto grid
+    ObfuscatedPuzzlePiece matchedPieceWithUpdatedOrigin = drawPiecesOntoGrid(
+        gridImage, grid, cellWidth, cellHeight, obfuscatedPuzzlePiece);
+
+    return new PuzzleGrid(matchedPieceWithUpdatedOrigin, gridSize, gridImage);
+  }
+
+  /**
+   * Validates input parameters for grid generation.
+   *
+   * @param obfuscatedPuzzlePiece The obfuscated piece to validate
+   * @param gridSize              The grid size to validate
+   * @throws IllegalArgumentException if inputs are invalid
+   */
+  private void validateGridInputs(ObfuscatedPuzzlePiece obfuscatedPuzzlePiece, int gridSize) {
+    if (obfuscatedPuzzlePiece == null || obfuscatedPuzzlePiece.image() == null) {
+      throw new IllegalArgumentException("ObfuscatedPuzzlePiece and its image cannot be null");
+    }
+
+    if (gridSize <= 0) {
+      throw new IllegalArgumentException("Grid size must be greater than 0");
+    }
+  }
+
+  /**
+   * Generates a random puzzle piece with the specified dimensions.
+   *
+   * <p>Process:
+   * <ul>
+   *   <li>Creates a new puzzle piece with a complex curved shape</li>
+   *   <li>Applies obfuscation with random margins and rotation</li>
+   * </ul>
+   *
+   * @param originSideLength The side length of the original puzzle piece before obfuscation
+   * @param finalSideLength  The final side length after obfuscation (must accommodate margins)
+   * @param color            The color used for drawing the puzzle piece outline
+   * @return An obfuscated puzzle piece with random rotation and margins
+   */
+  private ObfuscatedPuzzlePiece generateRandomPuzzlePiece(int originSideLength, int finalSideLength, Color color) {
+    SimplePuzzlePiece puzzlePiece = drawComplexPuzzlePiece(originSideLength, color);
+    return obfuscatePuzzlePiece(puzzlePiece, finalSideLength);
+  }
+
+  /**
+   * Draws a closed shape with randomly determined number of edges (5-10), where each edge is a random Bezier curve.
+   * The curves are generated using random control points that are not derived from the endpoints,
+   * ensuring truly organic and unpredictable shapes. Every shape has exactly one point on each side
+   * of the square border (top, left, right, bottom) to ensure proper coverage.
+   *
+   * @param squareSideLength The side length of the bounding square for the puzzle piece
+   * @param color            The color to use for drawing the puzzle piece outline
+   * @return SimplePuzzlePiece containing the drawn puzzle piece with transparent background
+   */
+  public SimplePuzzlePiece drawComplexPuzzlePiece(int squareSideLength, Color color) {
+    BufferedImage image = createTransparentImage(squareSideLength);
+    Graphics2D graphics = null;
+
+    try {
+      graphics = image.createGraphics();
+      configureGraphicsForQuality(graphics);
+      graphics.setColor(color);
+
+      int totalEdgeCount = generateRandomEdgeCount();
+      Vertex[] vertices = generateVerticesWithBorderConstraints(totalEdgeCount, squareSideLength);
+      Path2D shapePath = createCurvedShapePath(vertices, squareSideLength);
+
+      graphics.draw(shapePath);
+
+    } finally {
+      if (graphics != null) {
+        graphics.dispose();
+      }
+    }
+
+    return new SimplePuzzlePiece(new Rectangle(new Point(0, 0), image.getWidth(), image.getHeight()), image);
+  }
+
+  /**
+   * Draws all puzzle pieces onto the grid image and updates the matched piece's origin rectangle
+   * with coordinates that reflect its position in the final grid.
+   *
+   * <p>For the matched piece, the origin rectangle is updated such that:
+   * <ul>
+   *   <li>Original width and height are preserved</li>
+   *   <li>Top-left corner is offset by the grid cell position (drawX, drawY)</li>
+   *   <li>The result represents the piece's location in the final grid image</li>
+   * </ul>
+   *
+   * @param gridImage    The target grid image to draw on
+   * @param grid         The 2D array of obfuscated pieces
+   * @param cellWidth    The width of each cell
+   * @param cellHeight   The height of each cell
+   * @param matchedPiece The original matched piece (to track its position)
+   * @return The matched piece with updated origin rectangle containing proportional coordinates
+   */
+  private ObfuscatedPuzzlePiece drawPiecesOntoGrid(
+      BufferedImage gridImage, ObfuscatedPuzzlePiece[][] grid,
+      int cellWidth, int cellHeight, ObfuscatedPuzzlePiece matchedPiece) {
+
+    Graphics2D graphics = null;
+    ObfuscatedPuzzlePiece matchedPieceWithUpdatedOrigin = null;
+
+    try {
+      graphics = gridImage.createGraphics();
+      configureGraphicsForQuality(graphics);
+
+      for (int row = 0; row < grid.length; row++) {
+        for (int col = 0; col < grid[row].length; col++) {
+          ObfuscatedPuzzlePiece piece = grid[row][col];
+          int drawX = col * cellWidth;
+          int drawY = row * cellHeight;
+
+          // Draw the piece image onto the grid
+          graphics.drawImage(piece.image(), drawX, drawY, null);
+
+          // If this is the matched piece, update its origin rectangle with proportional coordinates
+          if (piece == matchedPiece) {
+            Rectangle originalRectangle = piece.origin().area();
+
+            // Update position: offset the original top-left corner by the cell position in the grid
+            int updatedLeftTopX = drawX + originalRectangle.leftTopCorner().x();
+            int updatedLeftTopY = drawY + originalRectangle.leftTopCorner().y();
+
+            // Preserve original width and height
+            int updatedWidth = originalRectangle.width();
+            int updatedHeight = originalRectangle.height();
+
+            // Create the updated origin rectangle with new position but original dimensions
+            Rectangle updatedRectangle = new Rectangle(
+                new Point(updatedLeftTopX, updatedLeftTopY),
+                updatedWidth,
+                updatedHeight
+            );
+
+            SimplePuzzlePiece updatedOrigin = new SimplePuzzlePiece(updatedRectangle, piece.origin().image());
+            matchedPieceWithUpdatedOrigin = new ObfuscatedPuzzlePiece(
+                updatedOrigin,
+                piece.rotateAngle(),
+                piece.image()
+            );
+          }
+        }
+      }
+
+    } finally {
+      if (graphics != null) {
+        graphics.dispose();
+      }
+    }
+
+    return matchedPieceWithUpdatedOrigin;
   }
 
   /**
@@ -283,51 +494,30 @@ public class NewPuzzleImageGenerator {
   }
 
   /**
-   * Draws a closed shape with randomly determined number of edges (5-10), where each edge is a random Bezier curve.
-   * The curves are generated using random control points that are not derived from the endpoints,
-   * ensuring truly organic and unpredictable shapes. Every shape has exactly one point on each side
-   * of the square border (top, left, right, bottom) to ensure proper coverage.
+   * Creates a square transparent BufferedImage with the specified side length.
+   * Convenience overload that delegates to {@link #createTransparentImage(int, int)}.
    *
-   * @param squareSideLength The side length of the bounding square for the puzzle piece
-   * @param color            The color to use for drawing the puzzle piece outline
-   * @return PuzzlePiece containing the drawn puzzle piece with transparent background
+   * @param sideLength The width and height of the square image in pixels
+   * @return A new square BufferedImage with fully transparent background (ARGB)
    */
-  public SimplePuzzlePiece drawComplexPuzzlePiece(int squareSideLength, Color color) {
-    BufferedImage image = createTransparentImage(squareSideLength);
-    Graphics2D graphics = null;
-
-    try {
-      graphics = image.createGraphics();
-      configureGraphicsForQuality(graphics);
-      graphics.setColor(color);
-
-      int totalEdgeCount = generateRandomEdgeCount();
-      Vertex[] vertices = generateVerticesWithBorderConstraints(totalEdgeCount, squareSideLength);
-      Path2D shapePath = createCurvedShapePath(vertices, squareSideLength);
-
-      graphics.draw(shapePath);
-
-    } finally {
-      if (graphics != null) {
-        graphics.dispose();
-      }
-    }
-
-    return new SimplePuzzlePiece(new Rectangle(new Point(0, 0), image.getWidth(), image.getHeight()), image);
+  private BufferedImage createTransparentImage(int sideLength) {
+    return createTransparentImage(sideLength, sideLength);
   }
 
   /**
-   * Creates a transparent BufferedImage with the specified dimensions.
+   * Creates a rectangular transparent BufferedImage with the specified dimensions.
+   * The image uses ARGB color model and is initialized with full transparency.
    *
-   * @param sideLength The width and height of the square image in pixels
-   * @return A new BufferedImage with transparent background
+   * @param width  The width of the image in pixels
+   * @param height The height of the image in pixels
+   * @return A new BufferedImage with fully transparent background (ARGB)
    */
-  private BufferedImage createTransparentImage(int sideLength) {
-    BufferedImage image = new BufferedImage(sideLength, sideLength, BufferedImage.TYPE_INT_ARGB);
+  private BufferedImage createTransparentImage(int width, int height) {
+    BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
     Graphics2D graphics = image.createGraphics();
     try {
       graphics.setComposite(AlphaComposite.Clear);
-      graphics.fillRect(0, 0, sideLength, sideLength);
+      graphics.fillRect(0, 0, width, height);
       graphics.setComposite(AlphaComposite.Src);
     } finally {
       graphics.dispose();
