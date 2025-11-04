@@ -257,6 +257,7 @@ public class NewPuzzleImageGenerator {
             matchedPieceWithUpdatedOrigin = new ObfuscatedPuzzlePiece(
                 updatedOrigin,
                 piece.rotateAngle(),
+                piece.scaleCoefficient(),
                 new Rectangle(new Point(drawX, drawY), piece.area().width(), piece.area().height()),
                 piece.image()
             );
@@ -342,6 +343,7 @@ public class NewPuzzleImageGenerator {
       originalImage = scaleImage(tmpImage, scaleCoefficient);
     } else {
       rotationAngle = 0;
+      scaleCoefficient = 1;
       originalImage = puzzlePiece.image();
     }
     //scale down
@@ -359,6 +361,7 @@ public class NewPuzzleImageGenerator {
     return new ObfuscatedPuzzlePiece(
         new SimplePuzzlePiece(originRectangle, puzzlePiece.image()),
         rotationAngle,
+        scaleCoefficient,
         new Rectangle(new Point(0, 0), squareSideLength, squareSideLength),
         obfuscatedImage
     );
