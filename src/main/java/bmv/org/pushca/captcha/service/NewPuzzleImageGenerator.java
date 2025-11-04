@@ -92,6 +92,7 @@ public class NewPuzzleImageGenerator {
    * @param gridSize    The grid dimensions (gridSize × gridSize cells, must be > 0)
    * @param cellSize    The size of each cell in the grid (must be > 0)
    * @param color       The color used for drawing randomly generated puzzle pieces (must not be null)
+   * @param topGrid     Whether this is the top grid (true) or bottom grid (false), affects puzzle piece scaling ranges
    * @return PuzzleGrid containing the matched piece with grid cell area and combined grid image
    * @throws IllegalArgumentException if puzzlePiece is null, gridSize <= 0, cellSize <= 0, or color is null
    */
@@ -165,6 +166,7 @@ public class NewPuzzleImageGenerator {
    * @param originSideLength The side length of the original puzzle piece before obfuscation
    * @param finalSideLength  The final side length after obfuscation (must accommodate margins)
    * @param color            The color used for drawing the puzzle piece outline
+   * @param topGrid          Whether this is the top grid (true) or bottom grid (false), affects puzzle piece scaling ranges
    * @return An obfuscated puzzle piece with random rotation and margins
    */
   private ObfuscatedPuzzlePiece generateRandomPuzzlePiece(int originSideLength, int finalSideLength, Color color, boolean topGrid) {
@@ -288,6 +290,22 @@ public class NewPuzzleImageGenerator {
     return new SimplePuzzlePiece(updatedRectangle, piece.origin().image());
   }
 
+  /**
+   * Creates an obfuscated puzzle piece by applying two-stage obfuscation with increasing square sizes.
+   *
+   * <p>Two-Stage Process:
+   * <ul>
+   *   <li>Stage 1: Obfuscates the puzzle piece with a smaller square size (squareSideLength - 60)</li>
+   *   <li>Stage 2: Applies obfuscation again using the full target square size with the first stage as a sampler</li>
+   *   <li>Sampling ensures consistent rotation and scaling between stages for coherent results</li>
+   * </ul>
+   *
+   * @param puzzlePiece      The puzzle piece containing the original image (must not be null)
+   * @param squareSideLength The final target square side length (must be > 0)
+   * @param topGrid          Whether this is the top grid (true) or bottom grid (false), affects puzzle piece scaling ranges
+   * @return ObfuscatedPuzzlePiece containing the resized image and position information
+   * @throws IllegalArgumentException if puzzlePiece is null or squareSideLength <= 0
+   */
   public ObfuscatedPuzzlePiece obfuscatePuzzlePiece(SimplePuzzlePiece puzzlePiece, int squareSideLength, boolean topGrid) {
     ObfuscatedPuzzlePiece obfuscatedPuzzlePiece0 = obfuscatePuzzlePiece(puzzlePiece, squareSideLength - 60, topGrid, null);
     return obfuscatePuzzlePiece(
@@ -318,12 +336,20 @@ public class NewPuzzleImageGenerator {
    *   <li>If insufficient space, fallback to minimum margin size on each side</li>
    * </ul>
    *
-   * @param puzzlePiece      The puzzle piece containing the original image
+   * <p>Sampling Behavior:
+   * <ul>
+   *   <li>If sampler is null: generates new random rotation angle and scale coefficient</li>
+   *   <li>If sampler is provided: reuses sampler's rotation and scale for consistency between obfuscation stages</li>
+   * </ul>
+   *
+   * @param puzzlePiece      The puzzle piece containing the original image (must not be null)
    * @param squareSideLength The side length of the target square (must be > 0)
+   * @param topGrid          Whether this is the top grid (true) or bottom grid (false), affects puzzle piece scaling ranges
+   * @param sampler          An obfuscated piece to sample rotation and scale from, or null to generate new values
    * @return ObfuscatedPuzzlePiece containing the resized image and position information
-   * @throws IllegalArgumentException if puzzlePiece or squareSideLength are invalid
+   * @throws IllegalArgumentException if puzzlePiece is null or squareSideLength <= 0
    */
-  public ObfuscatedPuzzlePiece obfuscatePuzzlePiece(SimplePuzzlePiece puzzlePiece, int squareSideLength, boolean topGrid,
+  private ObfuscatedPuzzlePiece obfuscatePuzzlePiece(SimplePuzzlePiece puzzlePiece, int squareSideLength, boolean topGrid,
                                                     ObfuscatedPuzzlePiece sampler) {
     validateObfuscationInputs(puzzlePiece, squareSideLength);
 
