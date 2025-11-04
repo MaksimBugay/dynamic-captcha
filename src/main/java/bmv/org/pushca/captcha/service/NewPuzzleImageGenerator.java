@@ -253,6 +253,7 @@ public class NewPuzzleImageGenerator {
             matchedPieceWithUpdatedOrigin = new ObfuscatedPuzzlePiece(
                 updatedOrigin,
                 piece.rotateAngle(),
+                new Rectangle(new Point(drawX, drawY), piece.area().width(), piece.area().height()),
                 piece.image()
             );
           }
@@ -330,6 +331,7 @@ public class NewPuzzleImageGenerator {
     return new ObfuscatedPuzzlePiece(
         new SimplePuzzlePiece(originRectangle, puzzlePiece.image()),
         rotationAngle,
+        new Rectangle(new Point(0, 0), obfuscatedImage.getWidth(), obfuscatedImage.getHeight()),
         obfuscatedImage
     );
   }

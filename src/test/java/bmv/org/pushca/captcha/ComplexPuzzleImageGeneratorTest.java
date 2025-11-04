@@ -55,8 +55,12 @@ public class ComplexPuzzleImageGeneratorTest {
           puzzleGrid.image(),
           puzzleGrid.matchedPiece().origin().area()
       );
+      BufferedImage puzzleGridWithMarkedOrigin1 = drawDashedRectangleOnGridImage(
+          puzzleGridWithMarkedOrigin,
+          puzzleGrid.matchedPiece().area()
+      );
       saveBytesToFile(
-          bufferedImageToBytes(puzzleGridWithMarkedOrigin, "png"),
+          bufferedImageToBytes(puzzleGridWithMarkedOrigin1, "png"),
           "puzzle_grid" + ".png"
       );
       try {

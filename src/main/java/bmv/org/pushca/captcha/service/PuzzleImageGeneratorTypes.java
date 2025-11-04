@@ -18,7 +18,7 @@ public class PuzzleImageGeneratorTypes {
   public record SimplePuzzlePiece(Rectangle area, BufferedImage image) {
   }
 
-  public record ObfuscatedPuzzlePiece(SimplePuzzlePiece origin, Double rotateAngle, BufferedImage image) {
+  public record ObfuscatedPuzzlePiece(SimplePuzzlePiece origin, Double rotateAngle, Rectangle area, BufferedImage image) {
   }
 
   public record PuzzleGrid(ObfuscatedPuzzlePiece matchedPiece, int gridSize, BufferedImage image) {
