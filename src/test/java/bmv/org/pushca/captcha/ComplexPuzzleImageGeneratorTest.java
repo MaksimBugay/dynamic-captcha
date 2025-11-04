@@ -44,23 +44,42 @@ public class ComplexPuzzleImageGeneratorTest {
           "puzzle_piece_with_selection" + ".png"
       );*/
 
-      PuzzleGrid puzzleGrid = generator.drawPuzzleGrid(
+      PuzzleGrid puzzleGrid1 = generator.drawPuzzleGrid(
           puzzlePiece,
           3,
           200,
           Color.BLUE
       );
-      BufferedImage puzzleGridWithMarkedOrigin = drawDashedRectangleOnGridImage(
-          puzzleGrid.image(),
-          puzzleGrid.matchedPiece().origin().area()
-      );
       BufferedImage puzzleGridWithMarkedOrigin1 = drawDashedRectangleOnGridImage(
-          puzzleGridWithMarkedOrigin,
-          puzzleGrid.matchedPiece().area()
+          puzzleGrid1.image(),
+          puzzleGrid1.matchedPiece().origin().area()
+      );
+      BufferedImage puzzleGridWithMarkedOrigin1a = drawDashedRectangleOnGridImage(
+          puzzleGridWithMarkedOrigin1,
+          puzzleGrid1.matchedPiece().area()
       );
       saveBytesToFile(
-          bufferedImageToBytes(puzzleGridWithMarkedOrigin1, "png"),
-          "puzzle_grid" + ".png"
+          bufferedImageToBytes(puzzleGridWithMarkedOrigin1a, "png"),
+          "puzzle_grid1" + ".png"
+      );
+
+      PuzzleGrid puzzleGrid2 = generator.drawPuzzleGrid(
+          puzzlePiece,
+          3,
+          200,
+          Color.BLUE
+      );
+      BufferedImage puzzleGridWithMarkedOrigin2 = drawDashedRectangleOnGridImage(
+          puzzleGrid2.image(),
+          puzzleGrid2.matchedPiece().origin().area()
+      );
+      BufferedImage puzzleGridWithMarkedOrigin2a = drawDashedRectangleOnGridImage(
+          puzzleGridWithMarkedOrigin2,
+          puzzleGrid2.matchedPiece().area()
+      );
+      saveBytesToFile(
+          bufferedImageToBytes(puzzleGridWithMarkedOrigin2a, "png"),
+          "puzzle_grid2" + ".png"
       );
       try {
         Thread.sleep(2000);
