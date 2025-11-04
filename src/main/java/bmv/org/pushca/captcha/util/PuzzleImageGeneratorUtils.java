@@ -15,6 +15,11 @@ import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes;
 public class PuzzleImageGeneratorUtils {
 
 
+  /**
+   * Generates a random boolean value.
+   *
+   * @return A random boolean (true or false with equal probability)
+   */
   public static boolean generateRandomBoolean() {
     return CaptchaGenerator.RANDOM.nextBoolean();
   }
@@ -85,12 +90,51 @@ public class PuzzleImageGeneratorUtils {
     return 15 + CaptchaGenerator.RANDOM.nextDouble() * 180;
   }
 
+  /**
+   * Scales a BufferedImage by the given scale coefficient.
+   *
+   * <p>The scaling operation:
+   * <ul>
+   *   <li>Maintains the image type (e.g., ARGB, RGB)</li>
+   *   <li>Uses high-quality interpolation (bilinear) for smooth scaling</li>
+   *   <li>Applies rendering hints for anti-aliasing and quality</li>
+   * </ul>
+   *
+   * @param inputImage       The image to scale (must not be null)
+   * @param scaleCoefficient The scale factor where:
+   *                         - 1.0 = original size
+   *                         - 2.0 = double size
+   *                         - 0.5 = half size
+   * @return A new scaled BufferedImage with dimensions adjusted by the scale coefficient
+   * @throws IllegalArgumentException if inputImage is null or has non-positive dimensions
+   */
   public static BufferedImage scaleImage(BufferedImage inputImage, double scaleCoefficient) {
     validateImageInput(inputImage);
 
     return scaleBufferedImage(inputImage, scaleCoefficient);
   }
 
+  /**
+   * Generates a random scale coefficient for image scaling.
+   * Used to create visual variation in puzzle piece sizes during obfuscation.
+   *
+   * <p>The coefficient is generated within a specified range:
+   * <ul>
+   *   <li>Minimum value: {@code min}</li>
+   *   <li>Maximum value: {@code min + delta}</li>
+   *   <li>Distribution: Uniform random within the range</li>
+   * </ul>
+   *
+   * <p>Typical usage:
+   * <ul>
+   *   <li>Top grid: scale between 0.6 and 0.8 (60-80% of original)</li>
+   *   <li>Bottom grid: scale between 0.8 and 1.0 (80-100% of original)</li>
+   * </ul>
+   *
+   * @param min   The minimum scale coefficient (e.g., 0.6 for 60% of original size)
+   * @param delta The range width added to min to get maximum (e.g., 0.2 gives max = 0.8)
+   * @return A random scale coefficient between min and (min + delta)
+   */
   public static double generateRandomScaleCoefficient(double min, double delta) {
     return min + CaptchaGenerator.RANDOM.nextDouble() * delta;
   }
@@ -141,11 +185,24 @@ public class PuzzleImageGeneratorUtils {
 
 
   /**
-   * Scales a BufferedImage by the given scale coefficient
+   * Scales a BufferedImage to new dimensions using high-quality interpolation.
    *
-   * @param inputImage       The image to scale
-   * @param scaleCoefficient The scale factor (1.0 = original size, 2.0 = double size, 0.5 = half size)
-   * @return A new scaled BufferedImage
+   * <p>Implementation details:
+   * <ul>
+   *   <li>New dimensions are calculated: newWidth = originalWidth * scaleCoefficient, newHeight = originalHeight * scaleCoefficient</li>
+   *   <li>Uses bilinear interpolation for smooth scaling</li>
+   *   <li>Applies high-quality rendering hints (anti-aliasing, quality rendering)</li>
+   *   <li>Preserves the original image type (ARGB, RGB, etc.)</li>
+   * </ul>
+   *
+   * <p>This is an internal helper method primarily used by {@link #scaleImage(BufferedImage, double)}.
+   *
+   * @param inputImage       The image to scale (must not be null)
+   * @param scaleCoefficient The scale factor where:
+   *                         - 1.0 = original size
+   *                         - 2.0 = double size
+   *                         - 0.5 = half size
+   * @return A new BufferedImage scaled to (originalWidth * scaleCoefficient) by (originalHeight * scaleCoefficient)
    */
   public static BufferedImage scaleBufferedImage(BufferedImage inputImage, double scaleCoefficient) {
     int originalWidth = inputImage.getWidth();

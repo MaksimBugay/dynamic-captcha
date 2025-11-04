@@ -71,6 +71,23 @@ public class NewPuzzleImageGenerator {
   private static final double RANDOMNESS_MULTIPLIER = 1.5; // Multiplier for increased margin randomness
   private static final int MIN_TOTAL_MARGIN_FOR_BOTH_SIDES = 2 * MIN_MARGIN_SIZE; // Ensure both sides have minimum
 
+  /**
+   * Generates complete puzzle task data including puzzle areas, the target image, and grid configuration.
+   * This method is the main entry point for creating a full puzzle captcha task.
+   *
+   * <p>Current Implementation Status: Placeholder implementation
+   * <ul>
+   *   <li>TODO: Complete the full implementation to generate all puzzle areas</li>
+   *   <li>TODO: Generate target image with proper grid assembly</li>
+   *   <li>TODO: Apply noise if requested</li>
+   * </ul>
+   *
+   * @param squareSideLength The side length of each puzzle piece in pixels (must be > 0)
+   * @param gridSize         The grid dimensions (gridSize × gridSize cells, must be > 0)
+   * @param applyNoise       Whether to apply noise to the puzzle images for increased difficulty
+   * @return PuzzleTaskFullData containing all puzzle areas, images, and grid information
+   * @throws IllegalArgumentException if squareSideLength <= 0 or gridSize <= 0
+   */
   public PuzzleTaskFullData generatePuzzleTaskFullData(int squareSideLength, int gridSize, boolean applyNoise) {
     //TODO add implementation
     return new PuzzleTaskFullData(
