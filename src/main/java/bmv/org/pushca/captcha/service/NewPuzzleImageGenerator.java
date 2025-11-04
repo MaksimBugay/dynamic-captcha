@@ -296,14 +296,14 @@ public class NewPuzzleImageGenerator {
   }
 
   public ObfuscatedPuzzlePiece obfuscatePuzzlePiece(SimplePuzzlePiece puzzlePiece, int squareSideLength) {
-    ObfuscatedPuzzlePiece obfuscatedPuzzlePiece0 = obfuscatePuzzlePiece(puzzlePiece, squareSideLength - 60, true);
+    ObfuscatedPuzzlePiece obfuscatedPuzzlePiece0 = obfuscatePuzzlePiece(puzzlePiece, squareSideLength - 60, null);
     return obfuscatePuzzlePiece(
         new SimplePuzzlePiece(
             new Rectangle(new Point(0, 0), obfuscatedPuzzlePiece0.area().width(), obfuscatedPuzzlePiece0.area().height()),
             obfuscatedPuzzlePiece0.image()
         ),
         squareSideLength,
-        false
+        obfuscatedPuzzlePiece0
     );
   }
 
@@ -329,21 +329,21 @@ public class NewPuzzleImageGenerator {
    * @return ObfuscatedPuzzlePiece containing the resized image and position information
    * @throws IllegalArgumentException if puzzlePiece or squareSideLength are invalid
    */
-  public ObfuscatedPuzzlePiece obfuscatePuzzlePiece(SimplePuzzlePiece puzzlePiece, int squareSideLength, boolean withTransformation) {
+  public ObfuscatedPuzzlePiece obfuscatePuzzlePiece(SimplePuzzlePiece puzzlePiece, int squareSideLength, ObfuscatedPuzzlePiece sampler) {
     validateObfuscationInputs(puzzlePiece, squareSideLength);
 
     double rotationAngle;
     double scaleCoefficient;
     BufferedImage originalImage;
 
-    if (withTransformation) {
+    if (sampler == null) {
       rotationAngle = generateRandomAngle();
       scaleCoefficient = generateRandomScaleCoefficient();
       BufferedImage tmpImage = rotateImage(puzzlePiece.image(), rotationAngle);
       originalImage = scaleImage(tmpImage, scaleCoefficient);
     } else {
-      rotationAngle = 0;
-      scaleCoefficient = 1;
+      rotationAngle = sampler.rotateAngle();
+      scaleCoefficient = sampler.scaleCoefficient();
       originalImage = puzzlePiece.image();
     }
     //scale down
