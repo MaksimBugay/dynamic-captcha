@@ -103,8 +103,8 @@ public class NewPuzzleImageGenerator {
    * @return PuzzleGrid containing the matched piece with grid cell area and combined grid image
    * @throws IllegalArgumentException if puzzlePiece is null, gridSize <= 0, cellSize <= 0, or color is null
    */
-  public PuzzleGrid drawPuzzleGrid(SimplePuzzlePiece puzzlePiece, int gridSize, int cellSize, Color color) {
-    ObfuscatedPuzzlePiece obfuscatedPuzzlePiece = obfuscatePuzzlePiece(puzzlePiece, cellSize);
+  public PuzzleGrid drawPuzzleGrid(SimplePuzzlePiece puzzlePiece, int gridSize, int cellSize, Color color, boolean topGrid) {
+    ObfuscatedPuzzlePiece obfuscatedPuzzlePiece = obfuscatePuzzlePiece(puzzlePiece, cellSize, topGrid);
     validateGridInputs(obfuscatedPuzzlePiece, gridSize);
 
     // Get dimensions from the provided obfuscated piece
@@ -125,7 +125,8 @@ public class NewPuzzleImageGenerator {
           grid[row][col] = generateRandomPuzzlePiece(
               puzzlePiece.area().width(),
               cellSize,
-              color
+              color,
+              topGrid
           );
         }
       }
@@ -174,9 +175,9 @@ public class NewPuzzleImageGenerator {
    * @param color            The color used for drawing the puzzle piece outline
    * @return An obfuscated puzzle piece with random rotation and margins
    */
-  private ObfuscatedPuzzlePiece generateRandomPuzzlePiece(int originSideLength, int finalSideLength, Color color) {
+  private ObfuscatedPuzzlePiece generateRandomPuzzlePiece(int originSideLength, int finalSideLength, Color color, boolean topGrid) {
     SimplePuzzlePiece puzzlePiece = drawComplexPuzzlePiece(originSideLength, color);
-    return obfuscatePuzzlePiece(puzzlePiece, finalSideLength);
+    return obfuscatePuzzlePiece(puzzlePiece, finalSideLength, topGrid);
   }
 
   /**
@@ -295,14 +296,15 @@ public class NewPuzzleImageGenerator {
     return new SimplePuzzlePiece(updatedRectangle, piece.origin().image());
   }
 
-  public ObfuscatedPuzzlePiece obfuscatePuzzlePiece(SimplePuzzlePiece puzzlePiece, int squareSideLength) {
-    ObfuscatedPuzzlePiece obfuscatedPuzzlePiece0 = obfuscatePuzzlePiece(puzzlePiece, squareSideLength - 60, null);
+  public ObfuscatedPuzzlePiece obfuscatePuzzlePiece(SimplePuzzlePiece puzzlePiece, int squareSideLength, boolean topGrid) {
+    ObfuscatedPuzzlePiece obfuscatedPuzzlePiece0 = obfuscatePuzzlePiece(puzzlePiece, squareSideLength - 60, topGrid, null);
     return obfuscatePuzzlePiece(
         new SimplePuzzlePiece(
             new Rectangle(new Point(0, 0), obfuscatedPuzzlePiece0.area().width(), obfuscatedPuzzlePiece0.area().height()),
             obfuscatedPuzzlePiece0.image()
         ),
         squareSideLength,
+        topGrid,
         obfuscatedPuzzlePiece0
     );
   }
@@ -329,7 +331,8 @@ public class NewPuzzleImageGenerator {
    * @return ObfuscatedPuzzlePiece containing the resized image and position information
    * @throws IllegalArgumentException if puzzlePiece or squareSideLength are invalid
    */
-  public ObfuscatedPuzzlePiece obfuscatePuzzlePiece(SimplePuzzlePiece puzzlePiece, int squareSideLength, ObfuscatedPuzzlePiece sampler) {
+  public ObfuscatedPuzzlePiece obfuscatePuzzlePiece(SimplePuzzlePiece puzzlePiece, int squareSideLength, boolean topGrid,
+                                                    ObfuscatedPuzzlePiece sampler) {
     validateObfuscationInputs(puzzlePiece, squareSideLength);
 
     double rotationAngle;
@@ -338,7 +341,7 @@ public class NewPuzzleImageGenerator {
 
     if (sampler == null) {
       rotationAngle = generateRandomAngle();
-      scaleCoefficient = generateRandomScaleCoefficient();
+      scaleCoefficient = generateRandomScaleCoefficient(topGrid ? 0.6 : 0.8, 0.2);
       BufferedImage tmpImage = rotateImage(puzzlePiece.image(), rotationAngle);
       originalImage = scaleImage(tmpImage, scaleCoefficient);
     } else {

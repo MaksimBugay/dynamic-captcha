@@ -81,40 +81,14 @@ public class PuzzleImageGeneratorUtils {
     return 15 + CaptchaGenerator.RANDOM.nextDouble() * 180;
   }
 
-  /**
-   * Scales down a BufferedImage by the given scale coefficient.
-   * If no coefficient is provided, a random scale factor between 0.6 and 0.9 is used.
-   *
-   * <p>Algorithm:
-   * <ul>
-   *   <li>If scaleCoefficient is null: generates random value in range [0.6, 0.9]</li>
-   *   <li>Delegates to {@link #scaleBufferedImage(BufferedImage, double)} for actual scaling</li>
-   *   <li>Maintains image quality with high-quality rendering hints</li>
-   * </ul>
-   *
-   * @param inputImage       The image to scale down
-   * @param scaleCoefficient The scale factor (1.0 = original, 0.5 = half size), or null for random (0.6-0.9)
-   * @return A new scaled-down BufferedImage
-   * @throws IllegalArgumentException if inputImage is null or has invalid dimensions
-   */
-  public static BufferedImage scaleImage(BufferedImage inputImage, Double scaleCoefficient) {
+  public static BufferedImage scaleImage(BufferedImage inputImage, double scaleCoefficient) {
     validateImageInput(inputImage);
 
-    // Use provided coefficient or generate random value between 0.6 and 0.9
-    double coefficient = (scaleCoefficient != null) ? scaleCoefficient : generateRandomScaleCoefficient();
-
-    return scaleBufferedImage(inputImage, coefficient);
+    return scaleBufferedImage(inputImage, scaleCoefficient);
   }
 
-  /**
-   * Generates a random scale coefficient between 0.6 and 0.9 for downscaling.
-   * Ensures the image is always reduced by 10-40% of its original size.
-   *
-   * @return A random scale factor in range [0.6, 0.9]
-   */
-  public static double generateRandomScaleCoefficient() {
-    // 0.3 = 0.9 - 0.6, gives range [0.6, 0.9]
-    return 0.6 + CaptchaGenerator.RANDOM.nextDouble() * 0.3;
+  public static double generateRandomScaleCoefficient(double min, double delta) {
+    return min + CaptchaGenerator.RANDOM.nextDouble() * delta;
   }
 
   /**

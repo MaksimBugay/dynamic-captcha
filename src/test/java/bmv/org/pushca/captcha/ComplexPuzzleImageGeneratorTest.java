@@ -48,9 +48,11 @@ public class ComplexPuzzleImageGeneratorTest {
           puzzlePiece,
           3,
           200,
-          Color.BLUE
+          Color.BLUE,
+          true
       );
       System.out.println(puzzleGrid1.matchedPiece().scaleCoefficient());
+      System.out.println(puzzleGrid1.matchedPiece().rotateAngle());
       BufferedImage puzzleGridWithMarkedOrigin1 = drawDashedRectangleOnGridImage(
           puzzleGrid1.image(),
           puzzleGrid1.matchedPiece().origin().area()
@@ -68,9 +70,11 @@ public class ComplexPuzzleImageGeneratorTest {
           puzzlePiece,
           3,
           200,
-          Color.BLUE
+          Color.BLUE,
+          false
       );
       System.out.println(puzzleGrid2.matchedPiece().scaleCoefficient());
+      System.out.println(puzzleGrid2.matchedPiece().rotateAngle());
       BufferedImage puzzleGridWithMarkedOrigin2 = drawDashedRectangleOnGridImage(
           puzzleGrid2.image(),
           puzzleGrid2.matchedPiece().origin().area()
