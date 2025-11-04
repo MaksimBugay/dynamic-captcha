@@ -47,7 +47,7 @@ public class ComplexPuzzleImageGeneratorTest {
       PuzzleGrid puzzleGrid = generator.drawPuzzleGrid(
           puzzlePiece,
           3,
-          240,
+          200,
           Color.BLUE
       );
       BufferedImage puzzleGridWithMarkedOrigin = drawDashedRectangleOnGridImage(

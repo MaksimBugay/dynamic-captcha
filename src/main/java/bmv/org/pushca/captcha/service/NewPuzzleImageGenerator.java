@@ -292,7 +292,7 @@ public class NewPuzzleImageGenerator {
   }
 
   public ObfuscatedPuzzlePiece obfuscatePuzzlePiece(SimplePuzzlePiece puzzlePiece, int squareSideLength) {
-    ObfuscatedPuzzlePiece obfuscatedPuzzlePiece0 = obfuscatePuzzlePiece(puzzlePiece, squareSideLength - 80, true);
+    ObfuscatedPuzzlePiece obfuscatedPuzzlePiece0 = obfuscatePuzzlePiece(puzzlePiece, squareSideLength - 60, true);
     return obfuscatePuzzlePiece(
         new SimplePuzzlePiece(
             new Rectangle(new Point(0, 0), obfuscatedPuzzlePiece0.area().width(), obfuscatedPuzzlePiece0.area().height()),
