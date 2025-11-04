@@ -96,11 +96,12 @@ public class NewPuzzleImageGenerator {
    *   <li>Formula: newX = gridCellX + originalX, newY = gridCellY + originalY</li>
    * </ul>
    *
-   * @param puzzlePiece The original puzzle piece to include in the grid
-   * @param gridSize    The grid dimensions (gridSize × gridSize)
-   * @param color       The color used for drawing randomly generated pieces
-   * @return PuzzleGrid containing the matched piece with updated coordinates and the combined grid image
-   * @throws IllegalArgumentException if obfuscatedPuzzlePiece is null or gridSize <= 0
+   * @param puzzlePiece The original puzzle piece to include in the grid (must not be null)
+   * @param gridSize    The grid dimensions (gridSize × gridSize cells, must be > 0)
+   * @param cellSize    The size of each cell in the grid (must be > 0)
+   * @param color       The color used for drawing randomly generated puzzle pieces (must not be null)
+   * @return PuzzleGrid containing the matched piece with grid cell area and combined grid image
+   * @throws IllegalArgumentException if puzzlePiece is null, gridSize <= 0, cellSize <= 0, or color is null
    */
   public PuzzleGrid drawPuzzleGrid(SimplePuzzlePiece puzzlePiece, int gridSize, int cellSize, Color color) {
     ObfuscatedPuzzlePiece obfuscatedPuzzlePiece = obfuscatePuzzlePiece(puzzlePiece, cellSize);

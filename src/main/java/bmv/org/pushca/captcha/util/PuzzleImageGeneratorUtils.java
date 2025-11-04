@@ -8,6 +8,10 @@ import java.awt.image.BufferedImage;
 import bmv.org.pushca.captcha.service.CaptchaGenerator;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes;
 
+/**
+ * Utility class for generating and manipulating puzzle images.
+ * This class provides methods for rotating, scaling, and drawing on images.
+ */
 public class PuzzleImageGeneratorUtils {
 
 
