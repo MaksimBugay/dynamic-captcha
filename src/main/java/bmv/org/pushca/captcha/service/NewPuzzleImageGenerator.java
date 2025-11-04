@@ -325,13 +325,13 @@ public class NewPuzzleImageGenerator {
    * @return ObfuscatedPuzzlePiece containing the resized image and position information
    * @throws IllegalArgumentException if puzzlePiece or squareSideLength are invalid
    */
-  public ObfuscatedPuzzlePiece obfuscatePuzzlePiece(SimplePuzzlePiece puzzlePiece, int squareSideLength, boolean rotate) {
+  public ObfuscatedPuzzlePiece obfuscatePuzzlePiece(SimplePuzzlePiece puzzlePiece, int squareSideLength, boolean withTransformation) {
     validateObfuscationInputs(puzzlePiece, squareSideLength);
 
     double rotationAngle;
     BufferedImage originalImage;
 
-    if (rotate) {
+    if (withTransformation) {
       rotationAngle = generateRandomAngle();
       originalImage = rotateImage(puzzlePiece.image(), rotationAngle);
     } else {
