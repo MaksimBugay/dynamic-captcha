@@ -94,13 +94,11 @@ public class ComplexPuzzleImageGeneratorTest {
       }
     }
 
-    if(true) return;
-
-    PuzzleTaskFullData fullData = generator.generatePuzzleTaskFullData(squareSideLength, gridSize, true);
+    /*PuzzleTaskFullData fullData = generator.generatePuzzleTaskFullData(squareSideLength, gridSize, true);
     saveBytesToFile(
         bufferedImageToBytes(fullData.puzzleGridImage(), "png"),
         "full_puzzle_board" + ".png"
-    );
+    );*/
 
     /*saveBytesToFile(
         bufferedImageToBytes(fullData.getCorrectOption().image(), "png"),

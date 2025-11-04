@@ -134,7 +134,7 @@ public class NewPuzzleImageGenerator {
     ObfuscatedPuzzlePiece matchedPieceWithUpdatedOrigin = drawPiecesOntoGrid(
         gridImage, grid, cellWidth, cellHeight, obfuscatedPuzzlePiece);
 
-    return new PuzzleGrid(matchedPieceWithUpdatedOrigin, gridSize, gridImage);
+    return new PuzzleGrid(matchedPieceWithUpdatedOrigin, gridImage);
   }
 
   /**
