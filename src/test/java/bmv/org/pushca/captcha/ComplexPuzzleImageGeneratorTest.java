@@ -19,6 +19,7 @@ public class ComplexPuzzleImageGeneratorTest {
     //ComplexPuzzleImageGenerator generator = new ComplexPuzzleImageGenerator();
     NewPuzzleImageGenerator generator = new NewPuzzleImageGenerator();
     int gridSize = 3; // Example grid size
+    boolean withSectors = false;
     //int squareSideLength = 400;
 
     for (int i = 0; i < 10; i++) {
@@ -46,18 +47,25 @@ public class ComplexPuzzleImageGeneratorTest {
       );
       System.out.println(puzzleGrid1.matchedPiece().scaleCoefficient());
       System.out.println(puzzleGrid1.matchedPiece().rotateAngle());
-      BufferedImage puzzleGridWithMarkedOrigin1 = drawDashedRectangleOnGridImage(
-          puzzleGrid1.image(),
-          puzzleGrid1.matchedPiece().origin().area()
-      );
-      BufferedImage puzzleGridWithMarkedOrigin1a = drawDashedRectangleOnGridImage(
-          puzzleGridWithMarkedOrigin1,
-          puzzleGrid1.matchedPiece().area()
-      );
-      saveBytesToFile(
-          bufferedImageToBytes(puzzleGridWithMarkedOrigin1a, "png"),
-          "puzzle_grid1" + ".png"
-      );
+      if (withSectors) {
+        BufferedImage puzzleGridWithMarkedOrigin1 = drawDashedRectangleOnGridImage(
+            puzzleGrid1.image(),
+            puzzleGrid1.matchedPiece().origin().area()
+        );
+        BufferedImage puzzleGridWithMarkedOrigin1a = drawDashedRectangleOnGridImage(
+            puzzleGridWithMarkedOrigin1,
+            puzzleGrid1.matchedPiece().area()
+        );
+        saveBytesToFile(
+            bufferedImageToBytes(puzzleGridWithMarkedOrigin1a, "png"),
+            "puzzle_grid1" + ".png"
+        );
+      } else {
+        saveBytesToFile(
+            bufferedImageToBytes(puzzleGrid1.image(), "png"),
+            "puzzle_grid1" + ".png"
+        );
+      }
 
       PuzzleGrid puzzleGrid2 = generator.drawPuzzleGrid(
           puzzlePiece,
@@ -68,18 +76,25 @@ public class ComplexPuzzleImageGeneratorTest {
       );
       System.out.println(puzzleGrid2.matchedPiece().scaleCoefficient());
       System.out.println(puzzleGrid2.matchedPiece().rotateAngle());
-      BufferedImage puzzleGridWithMarkedOrigin2 = drawDashedRectangleOnGridImage(
-          puzzleGrid2.image(),
-          puzzleGrid2.matchedPiece().origin().area()
-      );
-      BufferedImage puzzleGridWithMarkedOrigin2a = drawDashedRectangleOnGridImage(
-          puzzleGridWithMarkedOrigin2,
-          puzzleGrid2.matchedPiece().area()
-      );
-      saveBytesToFile(
-          bufferedImageToBytes(puzzleGridWithMarkedOrigin2a, "png"),
-          "puzzle_grid2" + ".png"
-      );
+      if (withSectors) {
+        BufferedImage puzzleGridWithMarkedOrigin2 = drawDashedRectangleOnGridImage(
+            puzzleGrid2.image(),
+            puzzleGrid2.matchedPiece().origin().area()
+        );
+        BufferedImage puzzleGridWithMarkedOrigin2a = drawDashedRectangleOnGridImage(
+            puzzleGridWithMarkedOrigin2,
+            puzzleGrid2.matchedPiece().area()
+        );
+        saveBytesToFile(
+            bufferedImageToBytes(puzzleGridWithMarkedOrigin2a, "png"),
+            "puzzle_grid2" + ".png"
+        );
+      } else {
+        saveBytesToFile(
+            bufferedImageToBytes(puzzleGrid2.image(), "png"),
+            "puzzle_grid2" + ".png"
+        );
+      }
       try {
         Thread.sleep(2000);
       } catch (InterruptedException e) {
