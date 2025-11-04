@@ -28,13 +28,11 @@ public class ComplexPuzzleImageGeneratorTest {
     int gridSize = 3; // Example grid size
     int squareSideLength = 400;
 
-    for (int i = 0; i < 30; i++) {
-      SimplePuzzlePiece puzzlePiece = generator.drawComplexPuzzlePiece(120, Color.BLUE);
-
-      ObfuscatedPuzzlePiece obfuscatedPuzzlePiece = generator.obfuscatePuzzlePiece(puzzlePiece, 200);
+    for (int i = 0; i < 10; i++) {
+      SimplePuzzlePiece puzzlePiece = generator.drawComplexPuzzlePiece(90, Color.BLUE);
 
       saveBytesToFile(
-          bufferedImageToBytes(obfuscatedPuzzlePiece.origin().image(), "png"),
+          bufferedImageToBytes(puzzlePiece.image(), "png"),
           "full_puzzle_board" + ".png"
       );
 
@@ -47,8 +45,9 @@ public class ComplexPuzzleImageGeneratorTest {
       );*/
 
       PuzzleGrid puzzleGrid = generator.drawPuzzleGrid(
-          obfuscatedPuzzlePiece,
+          puzzlePiece,
           3,
+          240,
           Color.BLUE
       );
       BufferedImage puzzleGridWithMarkedOrigin = drawDashedRectangleOnGridImage(
