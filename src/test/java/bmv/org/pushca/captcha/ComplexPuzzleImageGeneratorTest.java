@@ -3,11 +3,9 @@ package bmv.org.pushca.captcha;
 import static bmv.org.pushca.captcha.DynamicCaptchaApplicationTests.fileSystemCleanup;
 import static bmv.org.pushca.captcha.DynamicCaptchaApplicationTests.saveBytesToFile;
 import static bmv.org.pushca.captcha.service.CaptchaGenerator.bufferedImageToBytes;
-import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.addNoise;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.drawDashedRectangleOnGridImage;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomColor;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 import bmv.org.pushca.captcha.service.NewPuzzleImageGenerator;
@@ -20,7 +18,6 @@ public class ComplexPuzzleImageGeneratorTest {
     //ComplexPuzzleImageGenerator generator = new ComplexPuzzleImageGenerator();
     NewPuzzleImageGenerator generator = new NewPuzzleImageGenerator();
     int gridSize = 2; // Example grid size
-    boolean withSectors = false;
     //int squareSideLength = 400;
 
     for (int i = 0; i < 3; i++) {
@@ -56,33 +53,32 @@ public class ComplexPuzzleImageGeneratorTest {
       );
       System.out.println(puzzleGrid1.matchedPiece().scaleCoefficient());
       System.out.println(puzzleGrid1.matchedPiece().rotateAngle());*/
-      if (withSectors) {
-        BufferedImage puzzleGridWithMarkedMatches0 = drawDashedRectangleOnGridImage(
-            puzzleChallenge.image(),
-            puzzleChallenge.topMatchedPiece().origin().area()
-        );
-        BufferedImage puzzleGridWithMarkedMatches1 = drawDashedRectangleOnGridImage(
-            puzzleGridWithMarkedMatches0,
-            puzzleChallenge.topMatchedPiece().area()
-        );
-        BufferedImage puzzleGridWithMarkedMatches2 = drawDashedRectangleOnGridImage(
-            puzzleGridWithMarkedMatches1,
-            puzzleChallenge.bottomMatchedPiece().origin().area()
-        );
-        BufferedImage puzzleGridWithMarkedMatches3 = drawDashedRectangleOnGridImage(
-            puzzleGridWithMarkedMatches2,
-            puzzleChallenge.bottomMatchedPiece().area()
-        );
-        saveBytesToFile(
-            bufferedImageToBytes(puzzleGridWithMarkedMatches3, "png"),
-            "puzzle_grid1" + ".png"
-        );
-      } else {
-        saveBytesToFile(
-            bufferedImageToBytes(puzzleChallenge.image(), "png"),
-            "puzzle_grid1" + ".png"
-        );
-      }
+
+      saveBytesToFile(
+          bufferedImageToBytes(puzzleChallenge.image(), "png"),
+          "puzzle_grid" + ".png"
+      );
+      //===========================================================================
+      BufferedImage puzzleGridWithMarkedMatches0 = drawDashedRectangleOnGridImage(
+          puzzleChallenge.image(),
+          puzzleChallenge.topMatchedPiece().origin().area()
+      );
+      BufferedImage puzzleGridWithMarkedMatches1 = drawDashedRectangleOnGridImage(
+          puzzleGridWithMarkedMatches0,
+          puzzleChallenge.topMatchedPiece().area()
+      );
+      BufferedImage puzzleGridWithMarkedMatches2 = drawDashedRectangleOnGridImage(
+          puzzleGridWithMarkedMatches1,
+          puzzleChallenge.bottomMatchedPiece().origin().area()
+      );
+      BufferedImage puzzleGridWithMarkedMatches3 = drawDashedRectangleOnGridImage(
+          puzzleGridWithMarkedMatches2,
+          puzzleChallenge.bottomMatchedPiece().area()
+      );
+      saveBytesToFile(
+          bufferedImageToBytes(puzzleGridWithMarkedMatches3, "png"),
+          "puzzle_grid_with_areas" + ".png"
+      );
 
       /*PuzzleGrid puzzleGrid2 = generator.drawPuzzleGrid(
           puzzlePiece,
