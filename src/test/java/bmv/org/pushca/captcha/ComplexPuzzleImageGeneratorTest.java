@@ -9,6 +9,7 @@ import java.awt.Color;
 import java.awt.image.BufferedImage;
 
 import bmv.org.pushca.captcha.service.NewPuzzleImageGenerator;
+import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleGrid;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.SimplePuzzlePiece;
 
@@ -18,15 +19,22 @@ public class ComplexPuzzleImageGeneratorTest {
     fileSystemCleanup();
     //ComplexPuzzleImageGenerator generator = new ComplexPuzzleImageGenerator();
     NewPuzzleImageGenerator generator = new NewPuzzleImageGenerator();
-    int gridSize = 3; // Example grid size
-    boolean withSectors = false;
+    int gridSize = 2; // Example grid size
+    boolean withSectors = true;
     //int squareSideLength = 400;
 
-    for (int i = 0; i < 10; i++) {
-      SimplePuzzlePiece puzzlePiece = generator.drawComplexPuzzlePiece(90, Color.BLUE);
+    for (int i = 0; i < 3; i++) {
+      PuzzleImageGeneratorTypes.PuzzleChallenge puzzleChallenge = generator.generateFullPuzzleChallenge(
+          90,
+          200,
+          gridSize,
+          Color.BLUE
+      );
+
+      //SimplePuzzlePiece puzzlePiece = generator.drawComplexPuzzlePiece(90, Color.BLUE);
 
       saveBytesToFile(
-          bufferedImageToBytes(puzzlePiece.image(), "png"),
+          bufferedImageToBytes(puzzleChallenge.topMatchedPiece().origin().image(), "png"),
           "full_puzzle_board" + ".png"
       );
 
@@ -38,7 +46,7 @@ public class ComplexPuzzleImageGeneratorTest {
           "puzzle_piece_with_selection" + ".png"
       );*/
 
-      PuzzleGrid puzzleGrid1 = generator.drawPuzzleGrid(
+      /*PuzzleGrid puzzleGrid1 = generator.drawPuzzleGrid(
           puzzlePiece,
           gridSize,
           200,
@@ -46,28 +54,36 @@ public class ComplexPuzzleImageGeneratorTest {
           true
       );
       System.out.println(puzzleGrid1.matchedPiece().scaleCoefficient());
-      System.out.println(puzzleGrid1.matchedPiece().rotateAngle());
+      System.out.println(puzzleGrid1.matchedPiece().rotateAngle());*/
       if (withSectors) {
-        BufferedImage puzzleGridWithMarkedOrigin1 = drawDashedRectangleOnGridImage(
-            puzzleGrid1.image(),
-            puzzleGrid1.matchedPiece().origin().area()
+        BufferedImage puzzleGridWithMarkedMatches0 = drawDashedRectangleOnGridImage(
+            puzzleChallenge.image(),
+            puzzleChallenge.topMatchedPiece().origin().area()
         );
-        BufferedImage puzzleGridWithMarkedOrigin1a = drawDashedRectangleOnGridImage(
-            puzzleGridWithMarkedOrigin1,
-            puzzleGrid1.matchedPiece().area()
+        BufferedImage puzzleGridWithMarkedMatches1 = drawDashedRectangleOnGridImage(
+            puzzleGridWithMarkedMatches0,
+            puzzleChallenge.topMatchedPiece().area()
+        );
+        BufferedImage puzzleGridWithMarkedMatches2 = drawDashedRectangleOnGridImage(
+            puzzleGridWithMarkedMatches1,
+            puzzleChallenge.bottomMatchedPiece().origin().area()
+        );
+        BufferedImage puzzleGridWithMarkedMatches3 = drawDashedRectangleOnGridImage(
+            puzzleGridWithMarkedMatches2,
+            puzzleChallenge.bottomMatchedPiece().area()
         );
         saveBytesToFile(
-            bufferedImageToBytes(puzzleGridWithMarkedOrigin1a, "png"),
+            bufferedImageToBytes(puzzleGridWithMarkedMatches3, "png"),
             "puzzle_grid1" + ".png"
         );
       } else {
         saveBytesToFile(
-            bufferedImageToBytes(puzzleGrid1.image(), "png"),
+            bufferedImageToBytes(puzzleChallenge.image(), "png"),
             "puzzle_grid1" + ".png"
         );
       }
 
-      PuzzleGrid puzzleGrid2 = generator.drawPuzzleGrid(
+      /*PuzzleGrid puzzleGrid2 = generator.drawPuzzleGrid(
           puzzlePiece,
           gridSize,
           200,
@@ -94,7 +110,7 @@ public class ComplexPuzzleImageGeneratorTest {
             bufferedImageToBytes(puzzleGrid2.image(), "png"),
             "puzzle_grid2" + ".png"
         );
-      }
+      }*/
       try {
         Thread.sleep(2000);
       } catch (InterruptedException e) {

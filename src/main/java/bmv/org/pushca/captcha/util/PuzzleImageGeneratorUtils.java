@@ -24,6 +24,37 @@ public class PuzzleImageGeneratorUtils {
     return CaptchaGenerator.RANDOM.nextBoolean();
   }
 
+  public static BufferedImage concatenateImages(BufferedImage topImage, BufferedImage bottomImage) {
+    if (topImage == null || bottomImage == null) {
+      throw new IllegalArgumentException("Both topImage and bottomImage cannot be null");
+    }
+
+    int width = Math.max(topImage.getWidth(), bottomImage.getWidth());
+    int height = topImage.getHeight() + bottomImage.getHeight();
+
+    BufferedImage concatenatedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    Graphics2D graphics = null;
+
+    try {
+      graphics = concatenatedImage.createGraphics();
+      graphics.setColor(Color.WHITE);
+      graphics.fillRect(0, 0, width, height);
+
+      // Draw top image
+      graphics.drawImage(topImage, 0, 0, null);
+
+      // Draw bottom image below the top image
+      graphics.drawImage(bottomImage, 0, topImage.getHeight(), null);
+
+    } finally {
+      if (graphics != null) {
+        graphics.dispose();
+      }
+    }
+
+    return concatenatedImage;
+  }
+
   /**
    * Rotates a BufferedImage by the specified angle while maintaining the shape.
    * The rotated image dimensions are calculated to fit the entire rotated content.

@@ -1,5 +1,6 @@
 package bmv.org.pushca.captcha.service;
 
+import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.concatenateImages;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomAngle;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomBoolean;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomScaleCoefficient;
@@ -15,6 +16,7 @@ import java.awt.image.BufferedImage;
 
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.ObfuscatedPuzzlePiece;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Point;
+import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleChallenge;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleGrid;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Rectangle;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.SimplePuzzlePiece;
@@ -68,6 +70,57 @@ public class NewPuzzleImageGenerator {
   private static final int MIN_MARGIN_SIZE = 10; // Minimum empty space on each side in pixels
   private static final double RANDOMNESS_MULTIPLIER = 1.5; // Multiplier for increased margin randomness
   private static final int MIN_TOTAL_MARGIN_FOR_BOTH_SIDES = 2 * MIN_MARGIN_SIZE; // Ensure both sides have minimum
+
+  public PuzzleChallenge generateFullPuzzleChallenge(int originSquareSideLength, int cellSideLength, int gridSize, Color color) {
+    SimplePuzzlePiece puzzlePiece = drawComplexPuzzlePiece(originSquareSideLength, Color.BLUE);
+
+    PuzzleGrid topPuzzleGrid = drawPuzzleGrid(
+        puzzlePiece,
+        gridSize,
+        cellSideLength,
+        color,
+        true
+    );
+
+    PuzzleGrid bottomPuzzleGrid = drawPuzzleGrid(
+        puzzlePiece,
+        gridSize,
+        cellSideLength,
+        color,
+        false
+    );
+
+    ObfuscatedPuzzlePiece bottomMatchedPiece = bottomPuzzleGrid.matchedPiece();
+
+    return new PuzzleChallenge(
+        topPuzzleGrid.matchedPiece(),
+        new ObfuscatedPuzzlePiece(
+            new SimplePuzzlePiece(
+                new Rectangle(
+                    new Point(
+                        bottomMatchedPiece.origin().area().leftTopCorner().x(),
+                        bottomMatchedPiece.origin().area().leftTopCorner().y() + topPuzzleGrid.image().getHeight()
+                    ),
+                    bottomMatchedPiece.origin().area().width(),
+                    bottomMatchedPiece.origin().area().height()
+                ),
+                bottomMatchedPiece.origin().image()
+            ),
+            bottomMatchedPiece.rotateAngle(),
+            bottomMatchedPiece.scaleCoefficient(),
+            new Rectangle(
+                new Point(
+                    bottomMatchedPiece.area().leftTopCorner().x(),
+                    bottomMatchedPiece.area().leftTopCorner().y() + topPuzzleGrid.image().getHeight()
+                ),
+                bottomMatchedPiece.area().width(),
+                bottomMatchedPiece.area().height()
+            ),
+            bottomMatchedPiece.image()
+        ),
+        concatenateImages(topPuzzleGrid.image(), bottomPuzzleGrid.image())
+    );
+  }
 
   /**
    * Generates a puzzle grid by combining a provided obfuscated puzzle piece with randomly generated pieces.
@@ -350,7 +403,7 @@ public class NewPuzzleImageGenerator {
    * @throws IllegalArgumentException if puzzlePiece is null or squareSideLength <= 0
    */
   private ObfuscatedPuzzlePiece obfuscatePuzzlePiece(SimplePuzzlePiece puzzlePiece, int squareSideLength, boolean topGrid,
-                                                    ObfuscatedPuzzlePiece sampler) {
+                                                     ObfuscatedPuzzlePiece sampler) {
     validateObfuscationInputs(puzzlePiece, squareSideLength);
 
     double rotationAngle;
