@@ -40,12 +40,30 @@ public class PuzzleImageGeneratorUtils {
     return CaptchaGenerator.RANDOM.nextBoolean();
   }
 
+  /**
+   * Generates a random highly saturated, high-contrast color with no white-ish tones.
+   *
+   * <p>Color Generation Details:
+   * <ul>
+   *   <li>Uses HSB (Hue, Saturation, Brightness) color space for consistent visibility</li>
+   *   <li>Hue: Random across full spectrum (0-360°)</li>
+   *   <li>Saturation: 80-100% (ensures deep, vibrant colors with maximum contrast)</li>
+   *   <li>Brightness: 50-90% (avoids light/white-ish colors while maintaining visibility)</li>
+   * </ul>
+   *
+   * @return A random high-contrast vibrant Color that is always clearly visible and avoids white tones
+   */
   public static Color generateRandomColor() {
-    return new Color(
-        CaptchaGenerator.RANDOM.nextInt(256),
-        CaptchaGenerator.RANDOM.nextInt(256),
-        CaptchaGenerator.RANDOM.nextInt(256)
-    );
+    // Generate random hue across full spectrum (0-360 degrees)
+    float hue = CaptchaGenerator.RANDOM.nextFloat();
+    
+    // Generate saturation between 80% and 100% for maximum color richness and saturation
+    float saturation = 0.8f + CaptchaGenerator.RANDOM.nextFloat() * 0.2f;
+    
+    // Generate brightness between 50% and 90% to avoid white-ish/light colors
+    float brightness = 0.5f + CaptchaGenerator.RANDOM.nextFloat() * 0.4f;
+    
+    return new Color(Color.HSBtoRGB(hue, saturation, brightness));
   }
 
   /**
