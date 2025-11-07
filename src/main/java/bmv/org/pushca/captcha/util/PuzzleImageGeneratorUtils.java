@@ -24,6 +24,70 @@ public class PuzzleImageGeneratorUtils {
     return CaptchaGenerator.RANDOM.nextBoolean();
   }
 
+  public static BufferedImage addNoise(BufferedImage source, Color color) {
+    if (source == null) {
+      throw new IllegalArgumentException("Source image cannot be null");
+    }
+    if (color == null) {
+      throw new IllegalArgumentException("Color cannot be null");
+    }
+
+    int width = source.getWidth();
+    int height = source.getHeight();
+    BufferedImage noisyImage = new BufferedImage(width, height, source.getType());
+    Graphics2D graphics = null;
+
+    try {
+      graphics = noisyImage.createGraphics();
+      graphics.drawImage(source, 0, 0, null);
+      graphics.setColor(color);
+
+      // Add curved noise lines across the entire image with high density (30-60 px spacing)
+      int minSpacing = 30;
+      int maxSpacing = 60;
+      int maxLineLength = 7;
+
+      // Horizontal lines with vertical offset variation
+      for (int y = 0; y < height; y += CaptchaGenerator.RANDOM.nextInt(maxSpacing - minSpacing + 1) + minSpacing) {
+        int x = 0;
+        while (x < width) {
+          int lineLength = CaptchaGenerator.RANDOM.nextInt(maxLineLength) + 1;
+          int endX = Math.min(x + lineLength, width - 1);
+          int controlY = y + CaptchaGenerator.RANDOM.nextInt(4) - 2; // Random control point for curve
+          
+          // Set random stroke thickness (1-3 px)
+          float randomThickness = CaptchaGenerator.RANDOM.nextInt(3) + 1.0f;
+          graphics.setStroke(new BasicStroke(randomThickness));
+          graphics.drawLine(x, y, endX, controlY);
+          x = endX + CaptchaGenerator.RANDOM.nextInt(maxSpacing - minSpacing + 1) + minSpacing;
+        }
+      }
+
+      // Vertical lines with horizontal offset variation
+      for (int x = 0; x < width; x += CaptchaGenerator.RANDOM.nextInt(maxSpacing - minSpacing + 1) + minSpacing) {
+        int y = 0;
+        while (y < height) {
+          int lineLength = CaptchaGenerator.RANDOM.nextInt(maxLineLength) + 1;
+          int endY = Math.min(y + lineLength, height - 1);
+          int controlX = x + CaptchaGenerator.RANDOM.nextInt(4) - 2; // Random control point for curve
+          
+          // Set random stroke thickness (1-3 px)
+          float randomThickness = CaptchaGenerator.RANDOM.nextInt(3) + 1.0f;
+          graphics.setStroke(new BasicStroke(randomThickness));
+          graphics.drawLine(x, y, controlX, endY);
+          y = endY + CaptchaGenerator.RANDOM.nextInt(maxSpacing - minSpacing + 1) + minSpacing;
+        }
+      }
+
+    } finally {
+      if (graphics != null) {
+        graphics.dispose();
+      }
+    }
+
+    return noisyImage;
+  }
+
   public static BufferedImage concatenateImages(BufferedImage topImage, BufferedImage bottomImage) {
     if (topImage == null || bottomImage == null) {
       throw new IllegalArgumentException("Both topImage and bottomImage cannot be null");

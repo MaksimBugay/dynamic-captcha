@@ -3,6 +3,7 @@ package bmv.org.pushca.captcha;
 import static bmv.org.pushca.captcha.DynamicCaptchaApplicationTests.fileSystemCleanup;
 import static bmv.org.pushca.captcha.DynamicCaptchaApplicationTests.saveBytesToFile;
 import static bmv.org.pushca.captcha.service.CaptchaGenerator.bufferedImageToBytes;
+import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.addNoise;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.drawDashedRectangleOnGridImage;
 
 import java.awt.Color;
@@ -18,7 +19,7 @@ public class ComplexPuzzleImageGeneratorTest {
     //ComplexPuzzleImageGenerator generator = new ComplexPuzzleImageGenerator();
     NewPuzzleImageGenerator generator = new NewPuzzleImageGenerator();
     int gridSize = 2; // Example grid size
-    boolean withSectors = true;
+    boolean withSectors = false;
     //int squareSideLength = 400;
 
     for (int i = 0; i < 3; i++) {
@@ -55,7 +56,7 @@ public class ComplexPuzzleImageGeneratorTest {
       System.out.println(puzzleGrid1.matchedPiece().rotateAngle());*/
       if (withSectors) {
         BufferedImage puzzleGridWithMarkedMatches0 = drawDashedRectangleOnGridImage(
-            puzzleChallenge.image(),
+            addNoise(puzzleChallenge.image(), Color.BLUE),
             puzzleChallenge.topMatchedPiece().origin().area()
         );
         BufferedImage puzzleGridWithMarkedMatches1 = drawDashedRectangleOnGridImage(
@@ -76,7 +77,7 @@ public class ComplexPuzzleImageGeneratorTest {
         );
       } else {
         saveBytesToFile(
-            bufferedImageToBytes(puzzleChallenge.image(), "png"),
+            bufferedImageToBytes(addNoise(puzzleChallenge.image(), Color.BLUE), "png"),
             "puzzle_grid1" + ".png"
         );
       }
