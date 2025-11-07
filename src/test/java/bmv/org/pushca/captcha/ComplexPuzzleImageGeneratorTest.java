@@ -5,6 +5,7 @@ import static bmv.org.pushca.captcha.DynamicCaptchaApplicationTests.saveBytesToF
 import static bmv.org.pushca.captcha.service.CaptchaGenerator.bufferedImageToBytes;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.addNoise;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.drawDashedRectangleOnGridImage;
+import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomColor;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
@@ -27,7 +28,7 @@ public class ComplexPuzzleImageGeneratorTest {
           100,
           300,
           gridSize,
-          Color.BLUE,
+          generateRandomColor(),//Color.BLUE,
           true
       );
 

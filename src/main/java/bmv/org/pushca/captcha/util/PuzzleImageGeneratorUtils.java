@@ -40,6 +40,14 @@ public class PuzzleImageGeneratorUtils {
     return CaptchaGenerator.RANDOM.nextBoolean();
   }
 
+  public static Color generateRandomColor() {
+    return new Color(
+        CaptchaGenerator.RANDOM.nextInt(256),
+        CaptchaGenerator.RANDOM.nextInt(256),
+        CaptchaGenerator.RANDOM.nextInt(256)
+    );
+  }
+
   /**
    * Validates that both an image and a color are not null.
    *

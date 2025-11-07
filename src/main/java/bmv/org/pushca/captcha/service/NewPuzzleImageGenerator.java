@@ -74,7 +74,7 @@ public class NewPuzzleImageGenerator {
 
   public PuzzleChallenge generateFullPuzzleChallenge(int originSquareSideLength, int cellSideLength, int gridSize, Color color,
                                                      boolean withNoise) {
-    SimplePuzzlePiece puzzlePiece = drawComplexPuzzlePiece(originSquareSideLength, Color.BLUE);
+    SimplePuzzlePiece puzzlePiece = drawComplexPuzzlePiece(originSquareSideLength,color);
 
     PuzzleGrid topPuzzleGrid = drawPuzzleGrid(
         puzzlePiece,
