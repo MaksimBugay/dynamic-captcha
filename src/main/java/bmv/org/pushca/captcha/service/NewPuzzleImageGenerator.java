@@ -412,7 +412,7 @@ public class NewPuzzleImageGenerator {
 
     if (sampler == null) {
       rotationAngle = generateRandomAngle(topGrid ? 15 : 195, 180);
-      scaleCoefficient = generateRandomScaleCoefficient(topGrid ? 0.6 : 0.8, 0.2);
+      scaleCoefficient = generateRandomScaleCoefficient(1.0, topGrid ? 0.4 : -0.4);
       BufferedImage tmpImage = rotateImage(puzzlePiece.image(), rotationAngle);
       originalImage = scaleImage(tmpImage, scaleCoefficient);
     } else {
