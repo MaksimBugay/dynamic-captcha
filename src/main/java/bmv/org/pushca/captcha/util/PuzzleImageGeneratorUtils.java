@@ -70,7 +70,7 @@ public class PuzzleImageGeneratorUtils {
     }
 
     // Use provided angle or generate random angle
-    double rotationAngle = (angle != null) ? angle : generateRandomAngle();
+    double rotationAngle = (angle != null) ? angle : generateRandomAngle(15, 180);
     double rotationRadians = Math.toRadians(rotationAngle);
 
     // Calculate rotated dimensions to fit the entire rotated image
@@ -111,14 +111,9 @@ public class PuzzleImageGeneratorUtils {
     return rotatedImage;
   }
 
-  /**
-   * Generates a random rotation angle between 15 and 195 degrees.
-   * Used for random puzzle piece rotations to increase visual variation.
-   *
-   * @return A random angle in degrees between 15 and 195
-   */
-  public static double generateRandomAngle() {
-    return 15 + CaptchaGenerator.RANDOM.nextDouble() * 180;
+
+  public static double generateRandomAngle(int min, double delta) {
+    return min + CaptchaGenerator.RANDOM.nextDouble() * delta;
   }
 
   /**

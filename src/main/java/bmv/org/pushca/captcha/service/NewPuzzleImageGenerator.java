@@ -360,7 +360,7 @@ public class NewPuzzleImageGenerator {
    * @throws IllegalArgumentException if puzzlePiece is null or squareSideLength <= 0
    */
   public ObfuscatedPuzzlePiece obfuscatePuzzlePiece(SimplePuzzlePiece puzzlePiece, int squareSideLength, boolean topGrid) {
-    ObfuscatedPuzzlePiece obfuscatedPuzzlePiece0 = obfuscatePuzzlePiece(puzzlePiece, squareSideLength - 60, topGrid, null);
+    ObfuscatedPuzzlePiece obfuscatedPuzzlePiece0 = obfuscatePuzzlePiece(puzzlePiece, squareSideLength - 100, topGrid, null);
     return obfuscatePuzzlePiece(
         new SimplePuzzlePiece(
             new Rectangle(new Point(0, 0), obfuscatedPuzzlePiece0.area().width(), obfuscatedPuzzlePiece0.area().height()),
@@ -411,7 +411,7 @@ public class NewPuzzleImageGenerator {
     BufferedImage originalImage;
 
     if (sampler == null) {
-      rotationAngle = generateRandomAngle();
+      rotationAngle = generateRandomAngle(topGrid ? 15 : 195, 180);
       scaleCoefficient = generateRandomScaleCoefficient(topGrid ? 0.6 : 0.8, 0.2);
       BufferedImage tmpImage = rotateImage(puzzlePiece.image(), rotationAngle);
       originalImage = scaleImage(tmpImage, scaleCoefficient);

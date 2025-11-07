@@ -10,8 +10,6 @@ import java.awt.image.BufferedImage;
 
 import bmv.org.pushca.captcha.service.NewPuzzleImageGenerator;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleGrid;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.SimplePuzzlePiece;
 
 public class ComplexPuzzleImageGeneratorTest {
 
@@ -25,8 +23,8 @@ public class ComplexPuzzleImageGeneratorTest {
 
     for (int i = 0; i < 3; i++) {
       PuzzleImageGeneratorTypes.PuzzleChallenge puzzleChallenge = generator.generateFullPuzzleChallenge(
-          90,
-          200,
+          100,
+          300,
           gridSize,
           Color.BLUE
       );
