@@ -420,7 +420,7 @@ public class NewPuzzleImageGenerator {
       scaleCoefficient = sampler.scaleCoefficient();
       originalImage = puzzlePiece.image();
     }
-    //scale down
+
     ImageDimensions imageDimensions = extractImageDimensions(originalImage);
 
     MarginOffsets marginOffsets = calculateMarginOffsets(

@@ -3,6 +3,7 @@ package bmv.org.pushca.captcha.util;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 
 import bmv.org.pushca.captcha.service.CaptchaGenerator;
@@ -10,10 +11,25 @@ import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes;
 
 /**
  * Utility class for generating and manipulating puzzle images.
- * This class provides methods for rotating, scaling, and drawing on images.
+ * 
+ * <p>This class provides methods for:
+ * <ul>
+ *   <li>Rotating and scaling images with high-quality interpolation</li>
+ *   <li>Concatenating multiple images vertically</li>
+ *   <li>Adding noise patterns with curved lines</li>
+ *   <li>Drawing highlights on grid images</li>
+ *   <li>Random angle and scale coefficient generation</li>
+ * </ul>
  */
 public class PuzzleImageGeneratorUtils {
 
+  // Noise generation constants
+  private static final int NOISE_MIN_SPACING = 30; // Minimum pixel spacing between noise lines
+  private static final int NOISE_MAX_SPACING = 60; // Maximum pixel spacing between noise lines
+  private static final int NOISE_MAX_LINE_LENGTH = 7; // Maximum length of noise lines in pixels
+  private static final int NOISE_MIN_THICKNESS = 1; // Minimum stroke thickness for noise lines
+  private static final int NOISE_MAX_THICKNESS = 3; // Maximum stroke thickness for noise lines
+  private static final int NOISE_CURVE_VARIATION = 2; // Vertical/horizontal variation for curved effect
 
   /**
    * Generates a random boolean value.
@@ -24,17 +40,43 @@ public class PuzzleImageGeneratorUtils {
     return CaptchaGenerator.RANDOM.nextBoolean();
   }
 
-  public static BufferedImage addNoise(BufferedImage source, Color color) {
+  /**
+   * Validates that both an image and a color are not null.
+   *
+   * @param source The image to validate
+   * @param color  The color to validate
+   * @throws IllegalArgumentException if either parameter is null
+   */
+  private static void validateImageAndColor(BufferedImage source, Color color) {
     if (source == null) {
       throw new IllegalArgumentException("Source image cannot be null");
     }
     if (color == null) {
       throw new IllegalArgumentException("Color cannot be null");
     }
+  }
 
-    int width = source.getWidth();
-    int height = source.getHeight();
-    BufferedImage noisyImage = new BufferedImage(width, height, source.getType());
+  /**
+   * Adds noise pattern to an image using curved lines with varying thickness.
+   *
+   * <p>Noise Characteristics:
+   * <ul>
+   *   <li>Short curved lines: 1-7 pixels in length</li>
+   *   <li>High density coverage: 30-60 pixel spacing between lines</li>
+   *   <li>Variable thickness: 1-3 pixels per line</li>
+   *   <li>Both horizontal and vertical line orientations</li>
+   *   <li>Even distribution across the entire image</li>
+   * </ul>
+   *
+   * @param source The source image to add noise to (must not be null)
+   * @param color  The color used for drawing the noise lines (must not be null)
+   * @return A new BufferedImage with noise pattern applied
+   * @throws IllegalArgumentException if source or color is null
+   */
+  public static BufferedImage addNoise(BufferedImage source, Color color) {
+    validateImageAndColor(source, color);
+
+    BufferedImage noisyImage = new BufferedImage(source.getWidth(), source.getHeight(), source.getType());
     Graphics2D graphics = null;
 
     try {
@@ -42,42 +84,8 @@ public class PuzzleImageGeneratorUtils {
       graphics.drawImage(source, 0, 0, null);
       graphics.setColor(color);
 
-      // Add curved noise lines across the entire image with high density (30-60 px spacing)
-      int minSpacing = 30;
-      int maxSpacing = 60;
-      int maxLineLength = 7;
-
-      // Horizontal lines with vertical offset variation
-      for (int y = 0; y < height; y += CaptchaGenerator.RANDOM.nextInt(maxSpacing - minSpacing + 1) + minSpacing) {
-        int x = 0;
-        while (x < width) {
-          int lineLength = CaptchaGenerator.RANDOM.nextInt(maxLineLength) + 1;
-          int endX = Math.min(x + lineLength, width - 1);
-          int controlY = y + CaptchaGenerator.RANDOM.nextInt(4) - 2; // Random control point for curve
-          
-          // Set random stroke thickness (1-3 px)
-          float randomThickness = CaptchaGenerator.RANDOM.nextInt(3) + 1.0f;
-          graphics.setStroke(new BasicStroke(randomThickness));
-          graphics.drawLine(x, y, endX, controlY);
-          x = endX + CaptchaGenerator.RANDOM.nextInt(maxSpacing - minSpacing + 1) + minSpacing;
-        }
-      }
-
-      // Vertical lines with horizontal offset variation
-      for (int x = 0; x < width; x += CaptchaGenerator.RANDOM.nextInt(maxSpacing - minSpacing + 1) + minSpacing) {
-        int y = 0;
-        while (y < height) {
-          int lineLength = CaptchaGenerator.RANDOM.nextInt(maxLineLength) + 1;
-          int endY = Math.min(y + lineLength, height - 1);
-          int controlX = x + CaptchaGenerator.RANDOM.nextInt(4) - 2; // Random control point for curve
-          
-          // Set random stroke thickness (1-3 px)
-          float randomThickness = CaptchaGenerator.RANDOM.nextInt(3) + 1.0f;
-          graphics.setStroke(new BasicStroke(randomThickness));
-          graphics.drawLine(x, y, controlX, endY);
-          y = endY + CaptchaGenerator.RANDOM.nextInt(maxSpacing - minSpacing + 1) + minSpacing;
-        }
-      }
+      addHorizontalNoiseLines(graphics, source.getWidth(), source.getHeight());
+      addVerticalNoiseLines(graphics, source.getWidth(), source.getHeight());
 
     } finally {
       if (graphics != null) {
@@ -88,6 +96,112 @@ public class PuzzleImageGeneratorUtils {
     return noisyImage;
   }
 
+  /**
+   * Adds horizontal noise lines to the image with vertical offset variation.
+   *
+   * @param graphics The Graphics2D object to draw on
+   * @param width    The width of the image
+   * @param height   The height of the image
+   */
+  private static void addHorizontalNoiseLines(Graphics2D graphics, int width, int height) {
+    for (int y = 0; y < height; y += generateRandomSpacing()) {
+      drawNoiseSegmentsHorizontally(graphics, y, width);
+    }
+  }
+
+  /**
+   * Adds vertical noise lines to the image with horizontal offset variation.
+   *
+   * @param graphics The Graphics2D object to draw on
+   * @param width    The width of the image
+   * @param height   The height of the image
+   */
+  private static void addVerticalNoiseLines(Graphics2D graphics, int width, int height) {
+    for (int x = 0; x < width; x += generateRandomSpacing()) {
+      drawNoiseSegmentsVertically(graphics, x, height);
+    }
+  }
+
+  /**
+   * Draws horizontal noise line segments starting from a given y-coordinate.
+   *
+   * @param graphics The Graphics2D object to draw on
+   * @param y        The y-coordinate for horizontal lines
+   * @param width    The width of the image
+   */
+  private static void drawNoiseSegmentsHorizontally(Graphics2D graphics, int y, int width) {
+    int x = 0;
+    while (x < width) {
+      int lineLength = CaptchaGenerator.RANDOM.nextInt(NOISE_MAX_LINE_LENGTH) + 1;
+      int endX = Math.min(x + lineLength, width - 1);
+      int controlY = y + CaptchaGenerator.RANDOM.nextInt(2 * NOISE_CURVE_VARIATION + 1) - NOISE_CURVE_VARIATION;
+
+      applyRandomThicknessAndDraw(graphics, x, y, endX, controlY);
+      x = endX + generateRandomSpacing();
+    }
+  }
+
+  /**
+   * Draws vertical noise line segments starting from a given x-coordinate.
+   *
+   * @param graphics The Graphics2D object to draw on
+   * @param x        The x-coordinate for vertical lines
+   * @param height   The height of the image
+   */
+  private static void drawNoiseSegmentsVertically(Graphics2D graphics, int x, int height) {
+    int y = 0;
+    while (y < height) {
+      int lineLength = CaptchaGenerator.RANDOM.nextInt(NOISE_MAX_LINE_LENGTH) + 1;
+      int endY = Math.min(y + lineLength, height - 1);
+      int controlX = x + CaptchaGenerator.RANDOM.nextInt(2 * NOISE_CURVE_VARIATION + 1) - NOISE_CURVE_VARIATION;
+
+      applyRandomThicknessAndDraw(graphics, x, y, controlX, endY);
+      y = endY + generateRandomSpacing();
+    }
+  }
+
+  /**
+   * Applies random stroke thickness and draws a line segment.
+   *
+   * @param graphics The Graphics2D object to draw on
+   * @param x1       The starting x-coordinate
+   * @param y1       The starting y-coordinate
+   * @param x2       The ending x-coordinate
+   * @param y2       The ending y-coordinate
+   */
+  private static void applyRandomThicknessAndDraw(Graphics2D graphics, int x1, int y1, int x2, int y2) {
+    float randomThickness = CaptchaGenerator.RANDOM.nextInt(NOISE_MAX_THICKNESS - NOISE_MIN_THICKNESS + 1)
+        + NOISE_MIN_THICKNESS;
+    graphics.setStroke(new BasicStroke(randomThickness));
+    graphics.drawLine(x1, y1, x2, y2);
+  }
+
+  /**
+   * Generates a random spacing value between NOISE_MIN_SPACING and NOISE_MAX_SPACING.
+   *
+   * @return A random spacing value in pixels
+   */
+  private static int generateRandomSpacing() {
+    return CaptchaGenerator.RANDOM.nextInt(NOISE_MAX_SPACING - NOISE_MIN_SPACING + 1) + NOISE_MIN_SPACING;
+  }
+
+  /**
+   * Concatenates two images vertically into a single image.
+   *
+   * <p>Concatenation Details:
+   * <ul>
+   *   <li>Result width: maximum of the two image widths</li>
+   *   <li>Result height: sum of both image heights</li>
+   *   <li>Background: filled with white color</li>
+   *   <li>Top image is drawn at position (0, 0)</li>
+   *   <li>Bottom image is drawn at position (0, topImage.getHeight())</li>
+   * </ul>
+   *
+   * @param topImage    The image to place at the top (must not be null)
+   * @param bottomImage The image to place at the bottom (must not be null)
+   * @return A new BufferedImage with the two images concatenated vertically
+   * @throws IllegalArgumentException if either topImage or bottomImage is null
+   */
   public static BufferedImage concatenateImages(BufferedImage topImage, BufferedImage bottomImage) {
     if (topImage == null || bottomImage == null) {
       throw new IllegalArgumentException("Both topImage and bottomImage cannot be null");
@@ -120,12 +234,18 @@ public class PuzzleImageGeneratorUtils {
   }
 
   /**
-   * Rotates a BufferedImage by the specified angle while maintaining the shape.
-   * The rotated image dimensions are calculated to fit the entire rotated content.
+   * Rotates a BufferedImage by the specified angle while maintaining the complete rotated shape.
    *
-   * @param inputImage The image to rotate
-   * @param angle      The rotation angle in degrees, or null to use a random angle (15-195 degrees)
-   * @return A new BufferedImage with the rotated content
+   * <p>Rotation Details:
+   * <ul>
+   *   <li>Result dimensions are calculated to fit the entire rotated content without clipping</li>
+   *   <li>Background is filled with full transparency (ARGB)</li>
+   *   <li>Uses high-quality rendering hints (antialiasing, bilinear interpolation)</li>
+   * </ul>
+   *
+   * @param inputImage The image to rotate (must not be null)
+   * @param angle      The rotation angle in degrees. If null, uses a random angle (15-195 degrees)
+   * @return A new BufferedImage with the rotated content and transparent background
    * @throws IllegalArgumentException if inputImage is null
    */
   public static BufferedImage rotateImage(BufferedImage inputImage, Double angle) {
@@ -176,6 +296,13 @@ public class PuzzleImageGeneratorUtils {
   }
 
 
+  /**
+   * Generates a random rotation angle within a specified range.
+   *
+   * @param min   The minimum angle in degrees
+   * @param delta The range width (maximum angle = min + delta)
+   * @return A random angle between min and (min + delta) degrees
+   */
   public static double generateRandomAngle(int min, double delta) {
     return min + CaptchaGenerator.RANDOM.nextDouble() * delta;
   }
@@ -231,19 +358,20 @@ public class PuzzleImageGeneratorUtils {
 
   /**
    * Draws a dashed red rectangle on a grid image to highlight a specific area.
-   * Used for visual debugging and highlighting the matched puzzle piece area.
    *
-   * <p>Details:
+   * <p>This method is primarily used for visual debugging and highlighting the matched puzzle piece area.
+   *
+   * <p>Rectangle Style:
    * <ul>
-   *   <li>Dash pattern: 10 pixels on, 10 pixels off</li>
+   *   <li>Color: Red</li>
    *   <li>Stroke width: 2 pixels</li>
-   *   <li>Color: Red (for visibility)</li>
+   *   <li>Dash pattern: 10 pixels on, 10 pixels off</li>
    * </ul>
    *
-   * @param gridImage The grid image to draw on
-   * @param rectangle The rectangle to draw (position and dimensions)
+   * @param gridImage The grid image to draw on (must not be null)
+   * @param rectangle The rectangle to draw - contains position and dimensions (must not be null)
    * @return The modified grid image with the dashed rectangle drawn
-   * @throws IllegalArgumentException if gridImage is null or rectangle is null
+   * @throws IllegalArgumentException if gridImage or rectangle is null
    */
   public static BufferedImage drawDashedRectangleOnGridImage(BufferedImage gridImage, PuzzleImageGeneratorTypes.Rectangle rectangle) {
     if (gridImage == null) {
@@ -317,18 +445,36 @@ public class PuzzleImageGeneratorUtils {
     return scaledImage;
   }
 
+  /**
+   * Configures a Graphics2D object with high-quality rendering hints.
+   *
+   * <p>Applied Rendering Hints:
+   * <ul>
+   *   <li>Bilinear interpolation for smooth image scaling</li>
+   *   <li>High-quality rendering</li>
+   *   <li>Anti-aliasing enabled</li>
+   * </ul>
+   *
+   * @param scaledImage The BufferedImage to configure graphics for
+   * @return A configured Graphics2D object with quality rendering hints
+   */
   private static Graphics2D getGraphics2D(BufferedImage scaledImage) {
-    Graphics2D graphics;
-    graphics = scaledImage.createGraphics();
-    graphics.setRenderingHint(java.awt.RenderingHints.KEY_INTERPOLATION,
-        java.awt.RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-    graphics.setRenderingHint(java.awt.RenderingHints.KEY_RENDERING,
-        java.awt.RenderingHints.VALUE_RENDER_QUALITY);
-    graphics.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING,
-        java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+    Graphics2D graphics = scaledImage.createGraphics();
+    graphics.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+        RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+    graphics.setRenderingHint(RenderingHints.KEY_RENDERING,
+        RenderingHints.VALUE_RENDER_QUALITY);
+    graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+        RenderingHints.VALUE_ANTIALIAS_ON);
     return graphics;
   }
 
+  /**
+   * Validates that a BufferedImage is not null and has positive dimensions.
+   *
+   * @param inputImage The image to validate
+   * @throws IllegalArgumentException if inputImage is null or has non-positive dimensions
+   */
   private static void validateImageInput(BufferedImage inputImage) {
     if (inputImage == null) {
       throw new IllegalArgumentException("Input image cannot be null");
