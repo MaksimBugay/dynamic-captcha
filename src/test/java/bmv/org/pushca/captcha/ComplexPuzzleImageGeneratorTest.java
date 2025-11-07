@@ -27,7 +27,8 @@ public class ComplexPuzzleImageGeneratorTest {
           100,
           300,
           gridSize,
-          Color.BLUE
+          Color.BLUE,
+          true
       );
 
       //SimplePuzzlePiece puzzlePiece = generator.drawComplexPuzzlePiece(90, Color.BLUE);
@@ -56,7 +57,7 @@ public class ComplexPuzzleImageGeneratorTest {
       System.out.println(puzzleGrid1.matchedPiece().rotateAngle());*/
       if (withSectors) {
         BufferedImage puzzleGridWithMarkedMatches0 = drawDashedRectangleOnGridImage(
-            addNoise(puzzleChallenge.image(), Color.BLUE),
+            puzzleChallenge.image(),
             puzzleChallenge.topMatchedPiece().origin().area()
         );
         BufferedImage puzzleGridWithMarkedMatches1 = drawDashedRectangleOnGridImage(
@@ -77,7 +78,7 @@ public class ComplexPuzzleImageGeneratorTest {
         );
       } else {
         saveBytesToFile(
-            bufferedImageToBytes(addNoise(puzzleChallenge.image(), Color.BLUE), "png"),
+            bufferedImageToBytes(puzzleChallenge.image(), "png"),
             "puzzle_grid1" + ".png"
         );
       }

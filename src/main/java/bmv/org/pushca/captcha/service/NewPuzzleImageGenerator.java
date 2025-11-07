@@ -1,5 +1,6 @@
 package bmv.org.pushca.captcha.service;
 
+import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.addNoise;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.concatenateImages;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomAngle;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomBoolean;
@@ -71,7 +72,8 @@ public class NewPuzzleImageGenerator {
   private static final double RANDOMNESS_MULTIPLIER = 1.5; // Multiplier for increased margin randomness
   private static final int MIN_TOTAL_MARGIN_FOR_BOTH_SIDES = 2 * MIN_MARGIN_SIZE; // Ensure both sides have minimum
 
-  public PuzzleChallenge generateFullPuzzleChallenge(int originSquareSideLength, int cellSideLength, int gridSize, Color color) {
+  public PuzzleChallenge generateFullPuzzleChallenge(int originSquareSideLength, int cellSideLength, int gridSize, Color color,
+                                                     boolean withNoise) {
     SimplePuzzlePiece puzzlePiece = drawComplexPuzzlePiece(originSquareSideLength, Color.BLUE);
 
     PuzzleGrid topPuzzleGrid = drawPuzzleGrid(
@@ -92,6 +94,7 @@ public class NewPuzzleImageGenerator {
 
     ObfuscatedPuzzlePiece bottomMatchedPiece = bottomPuzzleGrid.matchedPiece();
 
+    BufferedImage concatenatedImages = concatenateImages(topPuzzleGrid.image(), bottomPuzzleGrid.image());
     return new PuzzleChallenge(
         topPuzzleGrid.matchedPiece(),
         new ObfuscatedPuzzlePiece(
@@ -118,7 +121,7 @@ public class NewPuzzleImageGenerator {
             ),
             bottomMatchedPiece.image()
         ),
-        concatenateImages(topPuzzleGrid.image(), bottomPuzzleGrid.image())
+        withNoise ? addNoise(concatenatedImages, color) : concatenatedImages
     );
   }
 
