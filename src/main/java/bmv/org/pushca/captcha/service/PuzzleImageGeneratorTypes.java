@@ -26,7 +26,27 @@ public class PuzzleImageGeneratorTypes {
 
   }
 
-  public record PuzzleChallenge(ObfuscatedPuzzlePiece topMatchedPiece, ObfuscatedPuzzlePiece bottomMatchedPiece, BufferedImage image) {
+  public record ComposedPuzzleGrid(ObfuscatedPuzzlePiece topMatchedPiece, ObfuscatedPuzzlePiece bottomMatchedPiece, BufferedImage image) {
+  }
+
+  public record PuzzleChallenge(SimplePuzzlePiece origin,
+                                SimplePuzzlePiece topMatchedPiece,
+                                SimplePuzzlePiece bottomMatchedPiece,
+                                BufferedImage image) {
+    public PuzzleChallenge(ComposedPuzzleGrid composedPuzzleGrid) {
+      this(
+          composedPuzzleGrid.topMatchedPiece().origin(),
+          new SimplePuzzlePiece(
+              composedPuzzleGrid.topMatchedPiece().origin.area(),
+              composedPuzzleGrid.topMatchedPiece().image()
+          ),
+          new SimplePuzzlePiece(
+              composedPuzzleGrid.bottomMatchedPiece().origin.area(),
+              composedPuzzleGrid.bottomMatchedPiece().image()
+          ),
+          composedPuzzleGrid.image
+      );
+    }
   }
 
   public record PuzzleArea(Rectangle rectangle, GridCellAddress address, boolean selected, BufferedImage image) {

@@ -17,6 +17,7 @@ import java.awt.image.BufferedImage;
 
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.ObfuscatedPuzzlePiece;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Point;
+import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.ComposedPuzzleGrid;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleChallenge;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleGrid;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Rectangle;
@@ -74,7 +75,7 @@ public class NewPuzzleImageGenerator {
 
   public PuzzleChallenge generateFullPuzzleChallenge(int originSquareSideLength, int cellSideLength, int gridSize, Color color,
                                                      boolean withNoise) {
-    SimplePuzzlePiece puzzlePiece = drawComplexPuzzlePiece(originSquareSideLength,color);
+    SimplePuzzlePiece puzzlePiece = drawComplexPuzzlePiece(originSquareSideLength, color);
 
     PuzzleGrid topPuzzleGrid = drawPuzzleGrid(
         puzzlePiece,
@@ -95,7 +96,7 @@ public class NewPuzzleImageGenerator {
     ObfuscatedPuzzlePiece bottomMatchedPiece = bottomPuzzleGrid.matchedPiece();
 
     BufferedImage concatenatedImages = concatenateImages(topPuzzleGrid.image(), bottomPuzzleGrid.image());
-    return new PuzzleChallenge(
+    ComposedPuzzleGrid composedPuzzleGrid = new ComposedPuzzleGrid(
         topPuzzleGrid.matchedPiece(),
         new ObfuscatedPuzzlePiece(
             new SimplePuzzlePiece(
@@ -123,6 +124,7 @@ public class NewPuzzleImageGenerator {
         ),
         withNoise ? addNoise(concatenatedImages, color) : concatenatedImages
     );
+    return new PuzzleChallenge(composedPuzzleGrid);
   }
 
   /**

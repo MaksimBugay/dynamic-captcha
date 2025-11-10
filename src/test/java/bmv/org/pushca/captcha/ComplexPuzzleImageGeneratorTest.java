@@ -9,7 +9,7 @@ import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRand
 import java.awt.image.BufferedImage;
 
 import bmv.org.pushca.captcha.service.NewPuzzleImageGenerator;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes;
+import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleChallenge;
 
 public class ComplexPuzzleImageGeneratorTest {
 
@@ -20,8 +20,8 @@ public class ComplexPuzzleImageGeneratorTest {
     int gridSize = 2; // Example grid size
     //int squareSideLength = 400;
 
-    for (int i = 0; i < 20; i++) {
-      PuzzleImageGeneratorTypes.PuzzleChallenge puzzleChallenge = generator.generateFullPuzzleChallenge(
+    for (int i = 0; i < 5; i++) {
+      PuzzleChallenge puzzleChallenge = generator.generateFullPuzzleChallenge(
           100,
           300,
           gridSize,
@@ -32,7 +32,7 @@ public class ComplexPuzzleImageGeneratorTest {
       //SimplePuzzlePiece puzzlePiece = generator.drawComplexPuzzlePiece(90, Color.BLUE);
 
       saveBytesToFile(
-          bufferedImageToBytes(puzzleChallenge.topMatchedPiece().origin().image(), "png"),
+          bufferedImageToBytes(puzzleChallenge.origin().image(), "png"),
           "full_puzzle_board" + ".png"
       );
 
@@ -61,7 +61,7 @@ public class ComplexPuzzleImageGeneratorTest {
       //===========================================================================
       BufferedImage puzzleGridWithMarkedMatches0 = drawDashedRectangleOnGridImage(
           puzzleChallenge.image(),
-          puzzleChallenge.topMatchedPiece().origin().area()
+          puzzleChallenge.topMatchedPiece().area()
       );
       BufferedImage puzzleGridWithMarkedMatches1 = drawDashedRectangleOnGridImage(
           puzzleGridWithMarkedMatches0,
@@ -69,7 +69,7 @@ public class ComplexPuzzleImageGeneratorTest {
       );
       BufferedImage puzzleGridWithMarkedMatches2 = drawDashedRectangleOnGridImage(
           puzzleGridWithMarkedMatches1,
-          puzzleChallenge.bottomMatchedPiece().origin().area()
+          puzzleChallenge.bottomMatchedPiece().area()
       );
       BufferedImage puzzleGridWithMarkedMatches3 = drawDashedRectangleOnGridImage(
           puzzleGridWithMarkedMatches2,
