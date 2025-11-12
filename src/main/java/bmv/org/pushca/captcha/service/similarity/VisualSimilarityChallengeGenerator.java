@@ -434,7 +434,7 @@ public class VisualSimilarityChallengeGenerator {
         marginOffsets.left, marginOffsets.top, imageDimensions.width, imageDimensions.height);
 
     return new ObfuscatedPuzzlePiece(
-        new SimplePuzzlePiece(originRectangle, puzzlePiece.image()),
+        new SimplePuzzlePiece(originRectangle, originalImage),
         rotationAngle,
         scaleCoefficient,
         new Rectangle(new Point(0, 0), squareSideLength, squareSideLength),

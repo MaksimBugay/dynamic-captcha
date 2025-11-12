@@ -3,7 +3,6 @@ package bmv.org.pushca.captcha.service.similarity;
 import java.awt.image.BufferedImage;
 
 import static bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorUtils.bufferedImageToBytes;
-import static bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorUtils.extractArea;
 
 public class PuzzleImageGeneratorTypes {
     public record Point(int x, int y) {
@@ -45,12 +44,12 @@ public class PuzzleImageGeneratorTypes {
             this(
                     composedPuzzleGrid.topMatchedPiece().origin(),
                     new SimplePuzzlePiece(
-                            composedPuzzleGrid.topMatchedPiece().origin.area(),
-                            extractArea(composedPuzzleGrid.image(), composedPuzzleGrid.topMatchedPiece().origin.area())
+                            composedPuzzleGrid.topMatchedPiece().origin().area(),
+                            composedPuzzleGrid.topMatchedPiece().origin().image()
                     ),
                     new SimplePuzzlePiece(
-                            composedPuzzleGrid.bottomMatchedPiece().origin.area(),
-                            extractArea(composedPuzzleGrid.image(), composedPuzzleGrid.bottomMatchedPiece().origin.area())
+                            composedPuzzleGrid.bottomMatchedPiece().origin().area(),
+                            composedPuzzleGrid.bottomMatchedPiece().origin().image()
                     ),
                     composedPuzzleGrid.image
             );
