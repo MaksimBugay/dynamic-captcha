@@ -8,7 +8,7 @@ import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRand
 
 import java.awt.image.BufferedImage;
 
-import bmv.org.pushca.captcha.service.NewPuzzleImageGenerator;
+import bmv.org.pushca.captcha.service.VisualSimilarityChallengeGenerator;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleChallenge;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.SimilarityChallenge;
 
@@ -17,7 +17,7 @@ public class ComplexPuzzleImageGeneratorTest {
   public static void main(String[] args) {
     fileSystemCleanup();
     //ComplexPuzzleImageGenerator generator = new ComplexPuzzleImageGenerator();
-    NewPuzzleImageGenerator generator = new NewPuzzleImageGenerator();
+    VisualSimilarityChallengeGenerator generator = new VisualSimilarityChallengeGenerator();
     int gridSize = 2; // Example grid size
     //int squareSideLength = 400;
 

@@ -27,6 +27,7 @@ import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Rectangle;
  *   <li>Random angle and scale coefficient generation</li>
  * </ul>
  */
+@SuppressWarnings("unused")
 public class PuzzleImageGeneratorUtils {
 
   // Noise generation constants

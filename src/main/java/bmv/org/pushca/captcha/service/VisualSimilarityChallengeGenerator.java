@@ -36,7 +36,7 @@ import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.SimplePuzzlePiec
  *   <li>All edges drawn as smooth Bezier curves with random control points</li>
  * </ul>
  */
-public class NewPuzzleImageGenerator {
+public class VisualSimilarityChallengeGenerator {
 
   // Shape generation constants
   private static final int MIN_EDGES = 5;
