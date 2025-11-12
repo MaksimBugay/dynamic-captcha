@@ -1,5 +1,7 @@
 package bmv.org.pushca.captcha.service;
 
+import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.bufferedImageToBytes;
+import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.extractArea;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.scaleBufferedImage;
 
 import java.awt.image.BufferedImage;
@@ -16,6 +18,15 @@ public class PuzzleImageGeneratorTypes {
   }
 
   public record SimplePuzzlePiece(Rectangle area, BufferedImage image) {
+  }
+
+  public record BinaryPuzzlePiece(Rectangle area, byte[] image) {
+    public BinaryPuzzlePiece(SimplePuzzlePiece simplePuzzlePiece) {
+      this(
+          simplePuzzlePiece.area(),
+          bufferedImageToBytes(simplePuzzlePiece.image(), "png")
+      );
+    }
   }
 
   public record ObfuscatedPuzzlePiece(SimplePuzzlePiece origin, Double rotateAngle, Double scaleCoefficient, Rectangle area,
@@ -38,13 +49,27 @@ public class PuzzleImageGeneratorTypes {
           composedPuzzleGrid.topMatchedPiece().origin(),
           new SimplePuzzlePiece(
               composedPuzzleGrid.topMatchedPiece().origin.area(),
-              composedPuzzleGrid.topMatchedPiece().image()
+              extractArea(composedPuzzleGrid.image(), composedPuzzleGrid.topMatchedPiece().origin.area())
           ),
           new SimplePuzzlePiece(
               composedPuzzleGrid.bottomMatchedPiece().origin.area(),
-              composedPuzzleGrid.bottomMatchedPiece().image()
+              extractArea(composedPuzzleGrid.image(), composedPuzzleGrid.bottomMatchedPiece().origin.area())
           ),
           composedPuzzleGrid.image
+      );
+    }
+  }
+
+  public record SimilarityChallenge(BinaryPuzzlePiece origin,
+                                    BinaryPuzzlePiece topMatchedPiece,
+                                    BinaryPuzzlePiece bottomMatchedPiece,
+                                    byte[] image) {
+    public SimilarityChallenge(PuzzleChallenge puzzleChallenge) {
+      this(
+          new BinaryPuzzlePiece(puzzleChallenge.origin()),
+          new BinaryPuzzlePiece(puzzleChallenge.topMatchedPiece()),
+          new BinaryPuzzlePiece(puzzleChallenge.bottomMatchedPiece()),
+          bufferedImageToBytes(puzzleChallenge.image(), "png")
       );
     }
   }

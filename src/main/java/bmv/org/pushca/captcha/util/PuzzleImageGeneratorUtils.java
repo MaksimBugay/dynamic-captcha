@@ -5,13 +5,19 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import bmv.org.pushca.captcha.service.CaptchaGenerator;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes;
+import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Rectangle;
 
 /**
  * Utility class for generating and manipulating puzzle images.
- * 
+ *
  * <p>This class provides methods for:
  * <ul>
  *   <li>Rotating and scaling images with high-quality interpolation</li>
@@ -56,13 +62,13 @@ public class PuzzleImageGeneratorUtils {
   public static Color generateRandomColor() {
     // Generate random hue across full spectrum (0-360 degrees)
     float hue = CaptchaGenerator.RANDOM.nextFloat();
-    
+
     // Generate saturation between 80% and 100% for maximum color richness and saturation
     float saturation = 0.8f + CaptchaGenerator.RANDOM.nextFloat() * 0.2f;
-    
+
     // Generate brightness between 50% and 90% to avoid white-ish/light colors
     float brightness = 0.5f + CaptchaGenerator.RANDOM.nextFloat() * 0.4f;
-    
+
     return new Color(Color.HSBtoRGB(hue, saturation, brightness));
   }
 
@@ -80,6 +86,56 @@ public class PuzzleImageGeneratorUtils {
     if (color == null) {
       throw new IllegalArgumentException("Color cannot be null");
     }
+  }
+
+  public static byte[] bufferedImageToBytes(BufferedImage image, String formatName) {
+    try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
+      ImageIO.write(image, formatName, byteArrayOutputStream);
+      return byteArrayOutputStream.toByteArray();
+    } catch (IOException e) {
+      throw new RuntimeException("Cannot convert BufferedImage to byte array", e);
+    }
+  }
+
+  public static BufferedImage bytesToBufferedImage(byte[] imageBytes) {
+    try (ByteArrayInputStream bytes = new ByteArrayInputStream(imageBytes)) {
+      return ImageIO.read(bytes);
+    } catch (IOException e) {
+      throw new RuntimeException("Cannot convert byte array to BufferedImage", e);
+    }
+  }
+
+  public static BufferedImage extractArea(BufferedImage source, Rectangle rectangle) {
+    if (source == null) {
+      throw new IllegalArgumentException("Source image cannot be null");
+    }
+    if (rectangle == null) {
+      throw new IllegalArgumentException("Rectangle cannot be null");
+    }
+    
+    PuzzleImageGeneratorTypes.Point topLeft = rectangle.leftTopCorner();
+    int x = topLeft.x();
+    int y = topLeft.y();
+    int width = rectangle.width();
+    int height = rectangle.height();
+    
+    // Ensure the extracted area is within image bounds
+    int maxX = Math.min(x + width, source.getWidth());
+    int maxY = Math.min(y + height, source.getHeight());
+    
+    // Validate coordinates
+    if (x < 0 || y < 0 || x >= source.getWidth() || y >= source.getHeight()) {
+      throw new IllegalArgumentException("Rectangle position is outside source image bounds");
+    }
+    
+    int extractWidth = maxX - x;
+    int extractHeight = maxY - y;
+    
+    if (extractWidth <= 0 || extractHeight <= 0) {
+      throw new IllegalArgumentException("Rectangle dimensions must result in positive area");
+    }
+    
+    return source.getSubimage(x, y, extractWidth, extractHeight);
   }
 
   /**
@@ -197,7 +253,7 @@ public class PuzzleImageGeneratorUtils {
    */
   private static void applyRandomThicknessAndDraw(Graphics2D graphics, int x1, int y1, int x2, int y2) {
     float randomThickness = CaptchaGenerator.RANDOM.nextInt(NOISE_MAX_THICKNESS - NOISE_MIN_THICKNESS + 1)
-        + NOISE_MIN_THICKNESS;
+                            + NOISE_MIN_THICKNESS;
     graphics.setStroke(new BasicStroke(randomThickness));
     graphics.drawLine(x1, y1, x2, y2);
   }
@@ -399,7 +455,7 @@ public class PuzzleImageGeneratorUtils {
    * @return The modified grid image with the dashed rectangle drawn
    * @throws IllegalArgumentException if gridImage or rectangle is null
    */
-  public static BufferedImage drawDashedRectangleOnGridImage(BufferedImage gridImage, PuzzleImageGeneratorTypes.Rectangle rectangle) {
+  public static BufferedImage drawDashedRectangleOnGridImage(BufferedImage gridImage, Rectangle rectangle) {
     if (gridImage == null) {
       throw new IllegalArgumentException("Grid image cannot be null");
     }

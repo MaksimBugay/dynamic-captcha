@@ -21,6 +21,7 @@ import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.ComposedPuzzleGr
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleChallenge;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleGrid;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Rectangle;
+import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.SimilarityChallenge;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.SimplePuzzlePiece;
 
 /**
@@ -72,6 +73,13 @@ public class NewPuzzleImageGenerator {
   private static final int MIN_MARGIN_SIZE = 10; // Minimum empty space on each side in pixels
   private static final double RANDOMNESS_MULTIPLIER = 1.5; // Multiplier for increased margin randomness
   private static final int MIN_TOTAL_MARGIN_FOR_BOTH_SIDES = 2 * MIN_MARGIN_SIZE; // Ensure both sides have minimum
+
+  public SimilarityChallenge generateVisualSimilarityChallenge(int originSquareSideLength, int cellSideLength, int gridSize, Color color,
+                                                               boolean withNoise) {
+    return new SimilarityChallenge(
+        generateFullPuzzleChallenge(originSquareSideLength, cellSideLength, gridSize, color, withNoise)
+    );
+  }
 
   public PuzzleChallenge generateFullPuzzleChallenge(int originSquareSideLength, int cellSideLength, int gridSize, Color color,
                                                      boolean withNoise) {

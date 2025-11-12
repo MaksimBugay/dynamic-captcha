@@ -10,6 +10,7 @@ import java.awt.image.BufferedImage;
 
 import bmv.org.pushca.captcha.service.NewPuzzleImageGenerator;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleChallenge;
+import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.SimilarityChallenge;
 
 public class ComplexPuzzleImageGeneratorTest {
 
@@ -29,12 +30,36 @@ public class ComplexPuzzleImageGeneratorTest {
           true
       );
 
+      SimilarityChallenge similarityChallenge = new SimilarityChallenge(
+          puzzleChallenge
+      );
+
       //SimplePuzzlePiece puzzlePiece = generator.drawComplexPuzzlePiece(90, Color.BLUE);
 
       saveBytesToFile(
-          bufferedImageToBytes(puzzleChallenge.origin().image(), "png"),
-          "full_puzzle_board" + ".png"
+          similarityChallenge.origin().image(),
+          "origin" + ".png"
       );
+      saveBytesToFile(
+          similarityChallenge.topMatchedPiece().image(),
+          "top_origin" + ".png"
+      );
+      if (puzzleChallenge.topMatchedPiece().area().width() != puzzleChallenge.topMatchedPiece().image().getWidth()
+          ||
+          puzzleChallenge.topMatchedPiece().area().height() != puzzleChallenge.topMatchedPiece().image().getHeight()
+      ) {
+        throw new RuntimeException("topMatchedPiece area is not equal to image size");
+      }
+      saveBytesToFile(
+          similarityChallenge.bottomMatchedPiece().image(),
+          "bottom_origin" + ".png"
+      );
+      if (puzzleChallenge.bottomMatchedPiece().area().width() != puzzleChallenge.bottomMatchedPiece().image().getWidth()
+          ||
+          puzzleChallenge.bottomMatchedPiece().area().height() != puzzleChallenge.bottomMatchedPiece().image().getHeight()
+      ) {
+        throw new RuntimeException("topMatchedPiece area is not equal to image size");
+      }
 
       /*BufferedImage puzzlePieceWithMarkedOrigin = drawDashedRectangleOnGridImage(obfuscatedPuzzlePiece.image(), obfuscatedPuzzlePiece.origin().area());
       BufferedImage puzzlePieceWithMarkedOriginWithBorders = drawDashedRectangleOnGridImage(
@@ -55,7 +80,7 @@ public class ComplexPuzzleImageGeneratorTest {
       System.out.println(puzzleGrid1.matchedPiece().rotateAngle());*/
 
       saveBytesToFile(
-          bufferedImageToBytes(puzzleChallenge.image(), "png"),
+          similarityChallenge.image(),
           "puzzle_grid" + ".png"
       );
       //===========================================================================
