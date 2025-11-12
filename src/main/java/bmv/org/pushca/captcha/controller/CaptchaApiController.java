@@ -5,7 +5,7 @@ import static bmv.org.pushca.captcha.service.PuzzleCaptchaService.PuzzleCaptchaS
 import bmv.org.pushca.captcha.service.CaptchaService;
 import bmv.org.pushca.captcha.service.CaptchaService.CaptchaSet;
 import bmv.org.pushca.captcha.service.PuzzleCaptchaService;
-import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.SimilarityChallenge;
 import bmv.org.pushca.captcha.service.similarity.VisualSimilarityCaptchaService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -54,7 +54,7 @@ public class CaptchaApiController {
     }
 
     @GetMapping(value = "/visual-similarity-captcha/generate-and-get")
-    Mono<PuzzleImageGeneratorTypes.SimilarityChallenge> generateVisualSimilarityCaptcha(
+    Mono<SimilarityChallenge> generateVisualSimilarityCaptcha(
             @RequestParam(name = "grid-size") int gridSize,
             @RequestParam(name = "piece-side-length") int pieceSideLengthPx,
             @RequestParam(name = "apply-noise", required = false, defaultValue = "true") boolean applyNoise
