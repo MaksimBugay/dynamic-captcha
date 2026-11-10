@@ -161,8 +161,8 @@ public class VisualSimilarityChallengeGenerator {
     // Create grid to hold all pieces
     ObfuscatedPuzzlePiece[][] grid = new ObfuscatedPuzzlePiece[gridSize][gridSize];
     // Place the provided piece at a random position
-    int selectedCellX = CaptchaGenerator.RANDOM.nextInt(gridSize);
-    int selectedCellY = CaptchaGenerator.RANDOM.nextInt(gridSize);
+    int selectedCellX = CaptchaGenerator.random().nextInt(gridSize);
+    int selectedCellY = CaptchaGenerator.random().nextInt(gridSize);
     grid[selectedCellY][selectedCellX] = obfuscatedPuzzlePiece;
 
     // Add generated pieces to grid
@@ -569,7 +569,7 @@ public class VisualSimilarityChallengeGenerator {
    */
   private int generateRandomOffsetWithMultiplier(int randomizableSpace) {
     // Generate random factor in [0.0, 1.0] range, then scale by multiplier
-    double randomFactor = CaptchaGenerator.RANDOM.nextDouble() * RANDOMNESS_MULTIPLIER;
+    double randomFactor = CaptchaGenerator.random().nextDouble() * RANDOMNESS_MULTIPLIER;
     int randomOffset = (int) (randomizableSpace * randomFactor);
 
     // Clamp to valid range [0, randomizableSpace]
@@ -653,7 +653,7 @@ public class VisualSimilarityChallengeGenerator {
    * @return A random integer between MIN_EDGES and MAX_EDGES (inclusive)
    */
   private int generateRandomEdgeCount() {
-    return MIN_EDGES + CaptchaGenerator.RANDOM.nextInt(MAX_EDGES - MIN_EDGES + 1);
+    return MIN_EDGES + CaptchaGenerator.random().nextInt(MAX_EDGES - MIN_EDGES + 1);
   }
 
   /**
@@ -758,7 +758,7 @@ public class VisualSimilarityChallengeGenerator {
    */
   private Vertex createBorderVertex(double margin, double availableRange, int squareSideLength,
                                     boolean isHorizontal, boolean isMaxEdge) {
-    double randomPosition = margin + CaptchaGenerator.RANDOM.nextDouble() * availableRange;
+    double randomPosition = margin + CaptchaGenerator.random().nextDouble() * availableRange;
     double fixedPosition = isMaxEdge ? squareSideLength : 0;
 
     return isHorizontal
@@ -885,7 +885,7 @@ public class VisualSimilarityChallengeGenerator {
    */
   private double calculateRandomizedRadius(double baseRadius) {
     double radiusRange = MAX_RADIUS_VARIATION - MIN_RADIUS_VARIATION;
-    double randomFactor = MIN_RADIUS_VARIATION + CaptchaGenerator.RANDOM.nextDouble() * radiusRange;
+    double randomFactor = MIN_RADIUS_VARIATION + CaptchaGenerator.random().nextDouble() * radiusRange;
     return baseRadius * randomFactor;
   }
 
@@ -951,7 +951,7 @@ public class VisualSimilarityChallengeGenerator {
    * @param squareSideLength The side length used for calculating curve deviation
    */
   private void addCurvedEdgeToPath(Path2D path, Vertex start, Vertex end, int squareSideLength) {
-    int segmentCount = MIN_CURVE_SEGMENTS + CaptchaGenerator.RANDOM.nextInt(MAX_CURVE_SEGMENTS - MIN_CURVE_SEGMENTS + 1);
+    int segmentCount = MIN_CURVE_SEGMENTS + CaptchaGenerator.random().nextInt(MAX_CURVE_SEGMENTS - MIN_CURVE_SEGMENTS + 1);
     double maxDeviation = squareSideLength * CURVE_DEVIATION_RATIO;
 
     double currentX = start.x;
@@ -1013,7 +1013,7 @@ public class VisualSimilarityChallengeGenerator {
    * @return A random value between -maxDeviation/2 and +maxDeviation/2
    */
   private double generateRandomDeviation(double maxDeviation) {
-    return (CaptchaGenerator.RANDOM.nextDouble() - 0.5) * maxDeviation;
+    return (CaptchaGenerator.random().nextDouble() - 0.5) * maxDeviation;
   }
 
   /**

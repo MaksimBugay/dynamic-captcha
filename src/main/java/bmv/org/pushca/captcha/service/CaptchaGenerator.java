@@ -4,12 +4,19 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.SplittableRandom;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.random.RandomGenerator;
 import javax.imageio.ImageIO;
 
 public interface CaptchaGenerator {
 
-  SplittableRandom RANDOM = new SplittableRandom();
+  /**
+   * Returns the random generator of the calling thread. Captchas are generated concurrently,
+   * so never store the result in a field shared between threads.
+   */
+  static RandomGenerator random() {
+    return ThreadLocalRandom.current();
+  }
 
   BufferedImage generateCaptchaImage(String text);
 

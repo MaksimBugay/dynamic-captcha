@@ -5,6 +5,10 @@ spring:
     name: dynamic-captcha
   webflux:
     base-path: /
+  web:
+    # Expose ResponseStatusException reasons (e.g. why a captcha request was rejected) to the caller
+    error:
+      include-message: always
   netty:
     leak-detection: PARANOID
 

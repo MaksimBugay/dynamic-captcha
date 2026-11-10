@@ -43,7 +43,7 @@ public class PuzzleImageGeneratorUtils {
    * @return A random boolean (true or false with equal probability)
    */
   public static boolean generateRandomBoolean() {
-    return CaptchaGenerator.RANDOM.nextBoolean();
+    return CaptchaGenerator.random().nextBoolean();
   }
 
   /**
@@ -61,13 +61,13 @@ public class PuzzleImageGeneratorUtils {
    */
   public static Color generateRandomColor() {
     // Generate random hue across full spectrum (0-360 degrees)
-    float hue = CaptchaGenerator.RANDOM.nextFloat();
+    float hue = CaptchaGenerator.random().nextFloat();
 
     // Generate saturation between 80% and 100% for maximum color richness and saturation
-    float saturation = 0.8f + CaptchaGenerator.RANDOM.nextFloat() * 0.2f;
+    float saturation = 0.8f + CaptchaGenerator.random().nextFloat() * 0.2f;
 
     // Generate brightness between 50% and 90% to avoid white-ish/light colors
-    float brightness = 0.5f + CaptchaGenerator.RANDOM.nextFloat() * 0.4f;
+    float brightness = 0.5f + CaptchaGenerator.random().nextFloat() * 0.4f;
 
     return new Color(Color.HSBtoRGB(hue, saturation, brightness));
   }
@@ -214,9 +214,9 @@ public class PuzzleImageGeneratorUtils {
   private static void drawNoiseSegmentsHorizontally(Graphics2D graphics, int y, int width) {
     int x = 0;
     while (x < width) {
-      int lineLength = CaptchaGenerator.RANDOM.nextInt(NOISE_MAX_LINE_LENGTH) + 1;
+      int lineLength = CaptchaGenerator.random().nextInt(NOISE_MAX_LINE_LENGTH) + 1;
       int endX = Math.min(x + lineLength, width - 1);
-      int controlY = y + CaptchaGenerator.RANDOM.nextInt(2 * NOISE_CURVE_VARIATION + 1) - NOISE_CURVE_VARIATION;
+      int controlY = y + CaptchaGenerator.random().nextInt(2 * NOISE_CURVE_VARIATION + 1) - NOISE_CURVE_VARIATION;
 
       applyRandomThicknessAndDraw(graphics, x, y, endX, controlY);
       x = endX + generateRandomSpacing();
@@ -233,9 +233,9 @@ public class PuzzleImageGeneratorUtils {
   private static void drawNoiseSegmentsVertically(Graphics2D graphics, int x, int height) {
     int y = 0;
     while (y < height) {
-      int lineLength = CaptchaGenerator.RANDOM.nextInt(NOISE_MAX_LINE_LENGTH) + 1;
+      int lineLength = CaptchaGenerator.random().nextInt(NOISE_MAX_LINE_LENGTH) + 1;
       int endY = Math.min(y + lineLength, height - 1);
-      int controlX = x + CaptchaGenerator.RANDOM.nextInt(2 * NOISE_CURVE_VARIATION + 1) - NOISE_CURVE_VARIATION;
+      int controlX = x + CaptchaGenerator.random().nextInt(2 * NOISE_CURVE_VARIATION + 1) - NOISE_CURVE_VARIATION;
 
       applyRandomThicknessAndDraw(graphics, x, y, controlX, endY);
       y = endY + generateRandomSpacing();
@@ -252,7 +252,7 @@ public class PuzzleImageGeneratorUtils {
    * @param y2       The ending y-coordinate
    */
   private static void applyRandomThicknessAndDraw(Graphics2D graphics, int x1, int y1, int x2, int y2) {
-    float randomThickness = CaptchaGenerator.RANDOM.nextInt(NOISE_MAX_THICKNESS - NOISE_MIN_THICKNESS + 1)
+    float randomThickness = CaptchaGenerator.random().nextInt(NOISE_MAX_THICKNESS - NOISE_MIN_THICKNESS + 1)
                             + NOISE_MIN_THICKNESS;
     graphics.setStroke(new BasicStroke(randomThickness));
     graphics.drawLine(x1, y1, x2, y2);
@@ -264,7 +264,7 @@ public class PuzzleImageGeneratorUtils {
    * @return A random spacing value in pixels
    */
   private static int generateRandomSpacing() {
-    return CaptchaGenerator.RANDOM.nextInt(NOISE_MAX_SPACING - NOISE_MIN_SPACING + 1) + NOISE_MIN_SPACING;
+    return CaptchaGenerator.random().nextInt(NOISE_MAX_SPACING - NOISE_MIN_SPACING + 1) + NOISE_MIN_SPACING;
   }
 
   /**
@@ -386,7 +386,7 @@ public class PuzzleImageGeneratorUtils {
    * @return A random angle between min and (min + delta) degrees
    */
   public static double generateRandomAngle(int min, double delta) {
-    return min + CaptchaGenerator.RANDOM.nextDouble() * delta;
+    return min + CaptchaGenerator.random().nextDouble() * delta;
   }
 
   /**
@@ -435,7 +435,7 @@ public class PuzzleImageGeneratorUtils {
    * @return A random scale coefficient between min and (min + delta)
    */
   public static double generateRandomScaleCoefficient(double min, double delta) {
-    return min + CaptchaGenerator.RANDOM.nextDouble() * delta;
+    return min + CaptchaGenerator.random().nextDouble() * delta;
   }
 
   /**

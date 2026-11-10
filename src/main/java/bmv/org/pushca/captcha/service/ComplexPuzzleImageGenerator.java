@@ -48,8 +48,8 @@ public class ComplexPuzzleImageGenerator {
         for (int j = 0; j < gridSize; j++) {
           int minSpacing = squareSize * 2 / 25;
           int maxSpacing = squareSize * 2 / 3;
-          int spacingX = minSpacing + CaptchaGenerator.RANDOM.nextInt(maxSpacing - minSpacing + 1); // Random spacing for X
-          int spacingY = minSpacing + CaptchaGenerator.RANDOM.nextInt(maxSpacing - minSpacing + 1); // Random spacing for Y
+          int spacingX = minSpacing + CaptchaGenerator.random().nextInt(maxSpacing - minSpacing + 1); // Random spacing for X
+          int spacingY = minSpacing + CaptchaGenerator.random().nextInt(maxSpacing - minSpacing + 1); // Random spacing for Y
           int pieceSize = squareSize - Math.max(spacingX, spacingY); // Adjusted piece size
 
           int pieceX = i * squareSize + spacingX / 2;
@@ -70,8 +70,8 @@ public class ComplexPuzzleImageGenerator {
             maxPieceCellAddress = new GridCellAddress(i, j);
           }
 
-          graphics.setColor(new Color(CaptchaGenerator.RANDOM.nextInt(256), CaptchaGenerator.RANDOM.nextInt(256),
-              CaptchaGenerator.RANDOM.nextInt(256))); // Random color
+          graphics.setColor(new Color(CaptchaGenerator.random().nextInt(256), CaptchaGenerator.random().nextInt(256),
+              CaptchaGenerator.random().nextInt(256))); // Random color
           drawComplexPuzzlePiece(graphics, pieceX, pieceY, pieceSize, applyNoise);
 
           // Draw center marker for each puzzle piece
@@ -105,7 +105,7 @@ public class ComplexPuzzleImageGenerator {
     int offset = size / 7; // Increased offset for more randomness
 
     // Move to the first corner with random offset
-    path.moveTo(x + CaptchaGenerator.RANDOM.nextInt(offset) - offset / 2.0, y + CaptchaGenerator.RANDOM.nextInt(offset) - offset / 2.0);
+    path.moveTo(x + CaptchaGenerator.random().nextInt(offset) - offset / 2.0, y + CaptchaGenerator.random().nextInt(offset) - offset / 2.0);
 
     // Top side with random Bezier curve
     drawRandomEdge(path, x, y, x + size, y, applyNoise);
@@ -130,10 +130,10 @@ public class ComplexPuzzleImageGenerator {
     double dy = (y2 - y1) / (double) segments;
 
     for (int i = 0; i < segments; i++) {
-      int controlX1 = (int) (x1 + i * dx + CaptchaGenerator.RANDOM.nextInt(noiseFactor) - noiseFactor / 2.0);
-      int controlY1 = (int) (y1 + i * dy + CaptchaGenerator.RANDOM.nextInt(noiseFactor) - noiseFactor / 2.0);
-      int controlX2 = (int) (x1 + (i + 1) * dx + CaptchaGenerator.RANDOM.nextInt(noiseFactor) - noiseFactor / 2.0);
-      int controlY2 = (int) (y1 + (i + 1) * dy + CaptchaGenerator.RANDOM.nextInt(noiseFactor) - noiseFactor / 2.0);
+      int controlX1 = (int) (x1 + i * dx + CaptchaGenerator.random().nextInt(noiseFactor) - noiseFactor / 2.0);
+      int controlY1 = (int) (y1 + i * dy + CaptchaGenerator.random().nextInt(noiseFactor) - noiseFactor / 2.0);
+      int controlX2 = (int) (x1 + (i + 1) * dx + CaptchaGenerator.random().nextInt(noiseFactor) - noiseFactor / 2.0);
+      int controlY2 = (int) (y1 + (i + 1) * dy + CaptchaGenerator.random().nextInt(noiseFactor) - noiseFactor / 2.0);
       int endX = (int) (x1 + (i + 1) * dx);
       int endY = (int) (y1 + (i + 1) * dy);
       path.curveTo(controlX1, controlY1, controlX2, controlY2, endX, endY);
@@ -196,8 +196,8 @@ public class ComplexPuzzleImageGenerator {
     int totalWidthMargin = targetLength - originalWidth;
     int totalHeightMargin = targetLength - originalHeight;
 
-    int leftMargin = CaptchaGenerator.RANDOM.nextInt(totalWidthMargin + 1);
-    int topMargin = CaptchaGenerator.RANDOM.nextInt(totalHeightMargin + 1);
+    int leftMargin = CaptchaGenerator.random().nextInt(totalWidthMargin + 1);
+    int topMargin = CaptchaGenerator.random().nextInt(totalHeightMargin + 1);
 
     // Create a new image with the target size
     BufferedImage newImage = new BufferedImage(targetLength, targetLength, image.getType());
@@ -229,8 +229,8 @@ public class ComplexPuzzleImageGenerator {
     int maxAdditionalHeight = (int) (originalHeight * 0.5);
 
     // Randomly determine the actual additional width and height
-    int additionalWidth = CaptchaGenerator.RANDOM.nextInt(maxAdditionalWidth + 1);
-    int additionalHeight = CaptchaGenerator.RANDOM.nextInt(maxAdditionalHeight + 1);
+    int additionalWidth = CaptchaGenerator.random().nextInt(maxAdditionalWidth + 1);
+    int additionalHeight = CaptchaGenerator.random().nextInt(maxAdditionalHeight + 1);
 
     // Calculate new dimensions
     int newWidth = originalWidth + additionalWidth;
@@ -247,8 +247,8 @@ public class ComplexPuzzleImageGenerator {
       graphics.fillRect(0, 0, newWidth, newHeight);
 
       // Calculate random margins
-      int leftMargin = CaptchaGenerator.RANDOM.nextInt(additionalWidth + 1);
-      int topMargin = CaptchaGenerator.RANDOM.nextInt(additionalHeight + 1);
+      int leftMargin = CaptchaGenerator.random().nextInt(additionalWidth + 1);
+      int topMargin = CaptchaGenerator.random().nextInt(additionalHeight + 1);
 
       // Draw the original image onto the new image with random margins
       graphics.drawImage(image, leftMargin, topMargin, null);
@@ -264,9 +264,9 @@ public class ComplexPuzzleImageGenerator {
   public BufferedImage applyRandomColorTransformation(BufferedImage inputImage) {
     Function<Color, Color> colorTransformation = color -> {
       // Generate random values to modify the color
-      int red = (color.getRed() + CaptchaGenerator.RANDOM.nextInt(256)) % 256;
-      int green = (color.getGreen() + CaptchaGenerator.RANDOM.nextInt(256)) % 256;
-      int blue = (color.getBlue() + CaptchaGenerator.RANDOM.nextInt(256)) % 256;
+      int red = (color.getRed() + CaptchaGenerator.random().nextInt(256)) % 256;
+      int green = (color.getGreen() + CaptchaGenerator.random().nextInt(256)) % 256;
+      int blue = (color.getBlue() + CaptchaGenerator.random().nextInt(256)) % 256;
 
       // Return the new color with the same alpha value
       return new Color(red, green, blue, color.getAlpha());
@@ -319,7 +319,7 @@ public class ComplexPuzzleImageGenerator {
           // Calculate harmonic wave distortions (very subtle)
           double waveAmplitude = 0.45; // Maximum displacement in pixels (very subtle distortion)
           double waveFrequency = 0.105; // Wave frequency (very subtle)
-          double phaseShift = CaptchaGenerator.RANDOM.nextDouble() * Math.PI * 2; // Random phase for variation
+          double phaseShift = CaptchaGenerator.random().nextDouble() * Math.PI * 2; // Random phase for variation
 
           // Create multiple overlapping sine waves for complex distortion
           double horizontalWave = Math.sin(y * waveFrequency + phaseShift) * waveAmplitude;
@@ -426,6 +426,7 @@ public class ComplexPuzzleImageGenerator {
   /**
    * Removes a connected region of colored pixels using systematic edge detection
    */
+  @SuppressWarnings("unused")
   public BufferedImage removeConnectedPixelRegion(BufferedImage inputImage) {
     BufferedImage resultImage = cloneBufferedImage(inputImage);
 
@@ -447,13 +448,13 @@ public class ComplexPuzzleImageGenerator {
     java.util.Set<Point> transparentPixels = new java.util.HashSet<>();
 
     // Create 3-4 gaps per piece for better visibility
-    int numberOfGaps = 3 + CaptchaGenerator.RANDOM.nextInt(2); // 3-4 gaps
+    int numberOfGaps = 3 + CaptchaGenerator.random().nextInt(2); // 3-4 gaps
 
     for (int i = 0; i < numberOfGaps && !edgePixels.isEmpty(); i++) {
       // Pick a random edge pixel that hasn't been made transparent yet
       Point startEdgePixel = null;
       for (int attempt = 0; attempt < 20 && startEdgePixel == null; attempt++) {
-        Point candidate = edgePixels.get(CaptchaGenerator.RANDOM.nextInt(edgePixels.size()));
+        Point candidate = edgePixels.get(CaptchaGenerator.random().nextInt(edgePixels.size()));
         if (!transparentPixels.contains(candidate)) {
           startEdgePixel = candidate;
         }
@@ -503,7 +504,7 @@ public class ComplexPuzzleImageGenerator {
         }
 
         Point candidate = allPoints.iterator().next();
-        int skipCount = CaptchaGenerator.RANDOM.nextInt(allPoints.size());
+        int skipCount = CaptchaGenerator.random().nextInt(allPoints.size());
         for (Point p : allPoints) {
           if (skipCount-- <= 0) {
             candidate = p;
@@ -519,7 +520,7 @@ public class ComplexPuzzleImageGenerator {
 
       if (center != null) {
         // Create a larger circular gap (10-15 pixel radius)
-        int radius = 10 + CaptchaGenerator.RANDOM.nextInt(6);
+        int radius = 10 + CaptchaGenerator.random().nextInt(6);
 
         for (int dy = -radius; dy <= radius; dy++) {
           for (int dx = -radius; dx <= radius; dx++) {
@@ -630,7 +631,7 @@ public class ComplexPuzzleImageGenerator {
                                               java.util.Set<Point> transparentPixels,
                                               int minPixels, int maxPixels) {
 
-    int targetPixels = minPixels + CaptchaGenerator.RANDOM.nextInt(maxPixels - minPixels + 1);
+    int targetPixels = minPixels + CaptchaGenerator.random().nextInt(maxPixels - minPixels + 1);
 
     // Find two different directions from the edge pixel
     java.util.List<Point> neighbors = coloredPixelMap.get(startPixel);
@@ -639,9 +640,9 @@ public class ComplexPuzzleImageGenerator {
     }
 
     // Pick two random directions if possible
-    Point direction1 = neighbors.get(CaptchaGenerator.RANDOM.nextInt(neighbors.size()));
+    Point direction1 = neighbors.get(CaptchaGenerator.random().nextInt(neighbors.size()));
     Point direction2 = neighbors.size() > 1 ?
-        neighbors.get(CaptchaGenerator.RANDOM.nextInt(neighbors.size())) : direction1;
+        neighbors.get(CaptchaGenerator.random().nextInt(neighbors.size())) : direction1;
 
     // Calculate direction vectors
     int[] dir1 = {direction1.x() - startPixel.x(), direction1.y() - startPixel.y()};
@@ -697,7 +698,7 @@ public class ComplexPuzzleImageGenerator {
 
             Point neighborPoint = new Point(currentX + dx, currentY + dy);
             if (coloredPixelMap.containsKey(neighborPoint) && !transparentPixels.contains(neighborPoint) &&
-                CaptchaGenerator.RANDOM.nextDouble() < 0.6) {
+                CaptchaGenerator.random().nextDouble() < 0.6) {
               image.setRGB(neighborPoint.x(), neighborPoint.y(), 0x00000000);
               transparentPixels.add(neighborPoint);
               removedCount++;
@@ -737,11 +738,11 @@ public class ComplexPuzzleImageGenerator {
           if (pixel.getAlpha() > 0) {
             // Random micro-displacement (very subtle)
             double tremorAmplitude = 0.10; // Very subtle tremor effect
-            int tremorX = (int) Math.round((CaptchaGenerator.RANDOM.nextGaussian() * tremorAmplitude));
-            int tremorY = (int) Math.round((CaptchaGenerator.RANDOM.nextGaussian() * tremorAmplitude));
+            int tremorX = (int) Math.round((CaptchaGenerator.random().nextGaussian() * tremorAmplitude));
+            int tremorY = (int) Math.round((CaptchaGenerator.random().nextGaussian() * tremorAmplitude));
 
-            int newX = Math.max(0, Math.min(width - 1, x + tremorX));
-            int newY = Math.max(0, Math.min(height - 1, y + tremorY));
+            int newX = Math.clamp(x + tremorX, 0, width - 1);
+            int newY = Math.clamp(y + tremorY, 0, height - 1);
 
             tremorImage.setRGB(newX, newY, pixel.getRGB());
           }
@@ -889,7 +890,7 @@ public class ComplexPuzzleImageGenerator {
                                                            Function<Integer, Integer> drawXSupplier,
                                                            Function<Integer, Integer> drawYSupplier) {
     // Random scale coefficient: 1.1 to 1.4 (all pieces enlarged)
-    double randomizer = CaptchaGenerator.RANDOM.nextDouble(0.3);
+    double randomizer = CaptchaGenerator.random().nextDouble(0.3);
     double scaleCoefficient = 1.1 + randomizer; // 1.1 to 1.4
 
     int scaledWidth = image.getWidth();
@@ -897,7 +898,7 @@ public class ComplexPuzzleImageGenerator {
 
     // Random rotation angle: 15 to 165 degrees
     double rotationAngle =
-        (inRotationAngle == null) ? 20 + CaptchaGenerator.RANDOM.nextDouble() * 340 : inRotationAngle; // 20 to 340 degrees
+        (inRotationAngle == null) ? 20 + CaptchaGenerator.random().nextDouble() * 340 : inRotationAngle; // 20 to 340 degrees
     double rotationRadians = Math.toRadians(rotationAngle);
 
     // Calculate rotated and scaled dimensions
@@ -952,7 +953,7 @@ public class ComplexPuzzleImageGenerator {
 
     // Align the width of the image with the width of the puzzle grid image
     int gridWidth = fullData.puzzleGridImage().getWidth();
-    double scaleCoefficient = 1.6 + CaptchaGenerator.RANDOM.nextDouble(0.4);
+    double scaleCoefficient = 1.6 + CaptchaGenerator.random().nextDouble(0.4);
     BufferedImage scaledTopPieceImage = scaleBufferedImage(puzzleImage.image(), scaleCoefficient);
     PuzzlePiece puzzlePieceWithMargins = addRandomMargins(
         scaledTopPieceImage,
@@ -970,7 +971,7 @@ public class ComplexPuzzleImageGenerator {
     // Calculate new dimensions for the composed image
     int minAdditionalSpace = (int) (fullData.puzzleGridImage().getHeight() * 0.1);
     int maxAdditionalSpace = (int) (fullData.puzzleGridImage().getHeight() * 0.3);
-    int additionalSpace = minAdditionalSpace + CaptchaGenerator.RANDOM.nextInt(maxAdditionalSpace - minAdditionalSpace + 1);
+    int additionalSpace = minAdditionalSpace + CaptchaGenerator.random().nextInt(maxAdditionalSpace - minAdditionalSpace + 1);
 
     int composedHeight = fullData.puzzleGridImage().getHeight() + imageWithMargins.getHeight() + additionalSpace;
     BufferedImage composedImage = new BufferedImage(gridWidth, composedHeight, BufferedImage.TYPE_INT_ARGB);
@@ -1029,10 +1030,10 @@ public class ComplexPuzzleImageGenerator {
   }
 
   public BufferedImage drawRandomCurvedLineThroughPoints(BufferedImage inputImage, Color color) {
-    double width = (0.02 + CaptchaGenerator.RANDOM.nextDouble(0.02)) * ((1.0 * inputImage.getWidth() + 1.0 * inputImage.getHeight()) / 2);
+    double width = (0.02 + CaptchaGenerator.random().nextDouble(0.02)) * ((1.0 * inputImage.getWidth() + 1.0 * inputImage.getHeight()) / 2);
 
     Point[] agePoints = gatherAgeColoredPoints(inputImage);
-    int ageIndex = CaptchaGenerator.RANDOM.nextInt(4);
+    int ageIndex = CaptchaGenerator.random().nextInt(4);
 
     BufferedImage bufferedImage = drawCurvedLineThroughPoints(
         inputImage,
@@ -1106,7 +1107,7 @@ public class ComplexPuzzleImageGenerator {
       path.moveTo(startPoint.x(), startPoint.y());
 
       // Calculate intermediate points for creating curves
-      int segments = 4 + CaptchaGenerator.RANDOM.nextInt(3); // 4-6 segments for variety
+      int segments = 4 + CaptchaGenerator.random().nextInt(3); // 4-6 segments for variety
 
       for (int i = 1; i <= segments; i++) {
         double t = (double) i / segments;
@@ -1117,7 +1118,7 @@ public class ComplexPuzzleImageGenerator {
 
         // Add random curvature
         double maxDeviation = Math.min(outputImage.getWidth(), outputImage.getHeight()) * 0.1; // 10% of image size
-        double deviation = (CaptchaGenerator.RANDOM.nextDouble() - 0.5) * maxDeviation;
+        double deviation = (CaptchaGenerator.random().nextDouble() - 0.5) * maxDeviation;
 
         // Perpendicular direction for curve deviation
         double perpX = -unitY;
@@ -1126,8 +1127,8 @@ public class ComplexPuzzleImageGenerator {
         double curveY = y + deviation * unitX;
 
         // Ensure curve points stay within image bounds
-        curveX = Math.max(0, Math.min(outputImage.getWidth() - 1, curveX));
-        curveY = Math.max(0, Math.min(outputImage.getHeight() - 1, curveY));
+        curveX = Math.clamp(curveX, 0, outputImage.getWidth() - 1);
+        curveY = Math.clamp(curveY, 0, outputImage.getHeight() - 1);
 
         if (i == segments) {
           // Last segment, draw to end point
@@ -1202,8 +1203,8 @@ public class ComplexPuzzleImageGenerator {
     int extendedY = (int) Math.round(y + t * dirY);
 
     // Clamp to image bounds
-    extendedX = Math.max(0, Math.min(width - 1, extendedX));
-    extendedY = Math.max(0, Math.min(height - 1, extendedY));
+    extendedX = Math.clamp(extendedX, 0, width - 1);
+    extendedY = Math.clamp(extendedY, 0, height - 1);
 
     return new Point(extendedX, extendedY);
   }
