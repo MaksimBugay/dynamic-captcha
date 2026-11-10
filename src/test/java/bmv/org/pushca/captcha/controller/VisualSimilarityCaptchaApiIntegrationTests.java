@@ -15,6 +15,7 @@ import java.awt.image.BufferedImage;
 import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -36,6 +37,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
+import reactor.netty.resources.LoopResources;
 
 /**
  * Exercises /visual-similarity-captcha/generate-and-get over real HTTP against the fully started application.
@@ -48,7 +50,11 @@ class VisualSimilarityCaptchaApiIntegrationTests {
 
   private static final Duration RESPONSE_TIMEOUT = Duration.ofMinutes(1);
 
-  private static final int PARALLEL_REQUESTS = 100;
+  private static final int PARALLEL_REQUESTS = 1000;
+
+  private static final int CONNECT_BATCH_SIZE = 20;
+
+  private static final Duration CONNECT_BATCH_INTERVAL = Duration.ofMillis(20);
 
   // Max per-channel difference allowed between a returned piece and the grid region it points to
   private static final int PIXEL_TOLERANCE = 3;
@@ -128,56 +134,76 @@ class VisualSimilarityCaptchaApiIntegrationTests {
         .maxConnections(PARALLEL_REQUESTS)
         .pendingAcquireMaxCount(PARALLEL_REQUESTS)
         .build();
+    // Own event loops, so the client does not compete with the server for its I/O threads
+    LoopResources clientLoops = LoopResources.create("parallel-captcha-client");
     try {
       WebClient parallelClient = WebClient.builder()
           .baseUrl(baseUrl)
-          .clientConnector(new ReactorClientHttpConnector(HttpClient.create(connections)))
+          .clientConnector(new ReactorClientHttpConnector(HttpClient.create(connections).runOn(clientLoops)))
           .exchangeStrategies(jsonExchangeStrategies())
           .build();
+      AtomicInteger inFlight = new AtomicInteger();
+      AtomicInteger peakInFlight = new AtomicInteger();
 
-      List<RequestOutcome> outcomes = Flux.range(0, PARALLEL_REQUESTS)
-          .flatMap(_ -> requestOutcome(parallelClient), PARALLEL_REQUESTS)
+      // Opening all connections in the same instant overflows the OS accept queue (128 on macOS) and the kernel
+      // resets the excess. Small batches stay under it and still open all connections within ~1 s.
+      List<RequestOutcome> outcomes = Flux.range(0, PARALLEL_REQUESTS / CONNECT_BATCH_SIZE)
+          .delayElements(CONNECT_BATCH_INTERVAL)
+          .concatMap(_ -> Flux.range(0, CONNECT_BATCH_SIZE))
+          .flatMap(_ -> requestOutcome(parallelClient)
+              .doOnSubscribe(_ -> peakInFlight.accumulateAndGet(inFlight.incrementAndGet(), Math::max))
+              .doFinally(_ -> inFlight.decrementAndGet()), PARALLEL_REQUESTS)
           .collectList()
           .block(RESPONSE_TIMEOUT);
+      System.out.println("Peak requests in flight: " + peakInFlight.get() + " of " + PARALLEL_REQUESTS);
 
       assertThat(outcomes).hasSize(PARALLEL_REQUESTS);
       assertThat(outcomes).filteredOn(outcome -> !outcome.succeeded()).as("failed requests").isEmpty();
-
-      List<SimilarityChallenge> challenges = outcomes.stream().map(RequestOutcome::challenge).toList();
-      assertThat(challenges).extracting(SimilarityChallenge::id).doesNotContainNull().doesNotHaveDuplicates();
-      assertThat(challenges).allSatisfy(challenge -> {
-        assertThat(bytesToBufferedImage(challenge.image())).isNotNull();
-        assertImageMatchesArea(challenge.topMatchedPiece());
-        assertImageMatchesArea(challenge.bottomMatchedPiece());
-      });
+      assertThat(peakInFlight.get()).as("requests in flight at the same time")
+          .isGreaterThanOrEqualTo(PARALLEL_REQUESTS / 2);
+      assertThat(outcomes).extracting(RequestOutcome::challengeId).doesNotHaveDuplicates();
       // Every request must get its own challenge. This does not prove the random generator is thread-safe:
       // a racy shared generator yields correlated values, which rarely produce byte-identical images.
-      assertThat(challenges).extracting(challenge -> UUID.nameUUIDFromBytes(challenge.image()))
-          .doesNotHaveDuplicates();
+      assertThat(outcomes).extracting(RequestOutcome::imageHash).doesNotHaveDuplicates();
     } finally {
       connections.dispose();
+      clientLoops.dispose();
     }
   }
 
   /**
    * Captures the result of one request instead of failing fast, so a failure report lists every failed request.
+   * The response is validated on arrival and only its id and image hash are kept, to bound memory use.
    */
   private static Mono<RequestOutcome> requestOutcome(WebClient webClient) {
     return webClient.get()
         .uri(ENDPOINT + "?grid-size=3&piece-side-length=" + MIN_PIECE_SIDE_LENGTH_PX + "&apply-noise=true")
         .exchangeToMono(response -> response.statusCode().is2xxSuccessful()
             ? response.bodyToMono(SimilarityChallenge.class)
-                .map(challenge -> new RequestOutcome(response.statusCode(), challenge, null))
+                .map(challenge -> RequestOutcome.validated(response.statusCode(), challenge))
             : response.bodyToMono(String.class)
                 .defaultIfEmpty("")
-                .map(body -> new RequestOutcome(response.statusCode(), null, body)))
-        .defaultIfEmpty(new RequestOutcome(null, null, "empty response body"))
-        .onErrorResume(error -> Mono.just(new RequestOutcome(null, null, error.toString())));
+                .map(body -> RequestOutcome.failed(response.statusCode(), body)))
+        .defaultIfEmpty(RequestOutcome.failed(null, "empty response body"))
+        .onErrorResume(error -> Mono.just(RequestOutcome.failed(null, error.toString())));
   }
 
-  private record RequestOutcome(HttpStatusCode status, SimilarityChallenge challenge, String failure) {
+  private record RequestOutcome(HttpStatusCode status, UUID challengeId, UUID imageHash, String failure) {
+
+    static RequestOutcome validated(HttpStatusCode status, SimilarityChallenge challenge) {
+      assertThat(challenge.id()).isNotNull();
+      assertThat(bytesToBufferedImage(challenge.image())).isNotNull();
+      assertImageMatchesArea(challenge.topMatchedPiece());
+      assertImageMatchesArea(challenge.bottomMatchedPiece());
+      return new RequestOutcome(status, challenge.id(), UUID.nameUUIDFromBytes(challenge.image()), null);
+    }
+
+    static RequestOutcome failed(HttpStatusCode status, String failure) {
+      return new RequestOutcome(status, null, null, failure);
+    }
+
     boolean succeeded() {
-      return status != null && status.is2xxSuccessful() && challenge != null;
+      return failure == null && status != null && status.is2xxSuccessful();
     }
   }
 
