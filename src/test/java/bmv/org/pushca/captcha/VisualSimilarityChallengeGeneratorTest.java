@@ -29,6 +29,7 @@ public class VisualSimilarityChallengeGeneratorTest {
         100, 300, 2, generateRandomColor(), true
     );
 
+    assertNotNull(challenge.id());
     BufferedImage grid = bytesToBufferedImage(challenge.image());
     assertNotNull(grid);
     assertPieceMatchesImage(challenge.origin());

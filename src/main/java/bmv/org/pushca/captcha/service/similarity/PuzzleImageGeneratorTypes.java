@@ -2,7 +2,9 @@ package bmv.org.pushca.captcha.service.similarity;
 
 import java.awt.image.BufferedImage;
 import java.util.Arrays;
+import java.util.UUID;
 
+import static bmv.org.pushca.captcha.service.PuzzleCaptchaService.ID_GENERATOR;
 import static bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorUtils.bufferedImageToBytes;
 import static bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorUtils.scaleBufferedImage;
 
@@ -58,12 +60,14 @@ public class PuzzleImageGeneratorTypes {
         }
     }
 
-    public record SimilarityChallenge(BinaryPuzzlePiece origin,
+    public record SimilarityChallenge(UUID id,
+                                      BinaryPuzzlePiece origin,
                                       BinaryPuzzlePiece topMatchedPiece,
                                       BinaryPuzzlePiece bottomMatchedPiece,
                                       byte[] image) {
         public SimilarityChallenge(PuzzleChallenge puzzleChallenge) {
             this(
+                    ID_GENERATOR.generate(),
                     new BinaryPuzzlePiece(puzzleChallenge.origin()),
                     new BinaryPuzzlePiece(puzzleChallenge.topMatchedPiece()),
                     new BinaryPuzzlePiece(puzzleChallenge.bottomMatchedPiece()),
