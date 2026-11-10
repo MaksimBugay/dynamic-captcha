@@ -5,8 +5,8 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleArea;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleTaskFullData;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.PuzzleArea;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.PuzzleTaskFullData;
 import org.junit.jupiter.api.Test;
 
 class PuzzleCaptchaServiceTest {

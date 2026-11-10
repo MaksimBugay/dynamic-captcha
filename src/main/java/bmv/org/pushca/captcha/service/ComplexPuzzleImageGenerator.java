@@ -1,6 +1,6 @@
 package bmv.org.pushca.captcha.service;
 
-import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.scaleBufferedImage;
+import static bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorUtils.scaleBufferedImage;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -13,14 +13,14 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Function;
 
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.GridCellAddress;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Point;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleArea;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleImage;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzlePiece;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleTaskData;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleTaskFullData;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Rectangle;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.GridCellAddress;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.Point;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.PuzzleArea;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.PuzzleImage;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.PuzzlePiece;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.PuzzleTaskData;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.PuzzleTaskFullData;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.Rectangle;
 
 public class ComplexPuzzleImageGenerator {
 

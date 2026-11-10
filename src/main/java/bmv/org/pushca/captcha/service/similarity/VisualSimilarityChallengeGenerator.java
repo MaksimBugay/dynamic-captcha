@@ -1,12 +1,4 @@
-package bmv.org.pushca.captcha.service;
-
-import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.addNoise;
-import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.concatenateImages;
-import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomAngle;
-import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomBoolean;
-import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomScaleCoefficient;
-import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.rotateImage;
-import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.scaleImage;
+package bmv.org.pushca.captcha.service.similarity;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -15,14 +7,10 @@ import java.awt.RenderingHints;
 import java.awt.geom.Path2D;
 import java.awt.image.BufferedImage;
 
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.ObfuscatedPuzzlePiece;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Point;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.ComposedPuzzleGrid;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleChallenge;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleGrid;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Rectangle;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.SimilarityChallenge;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.SimplePuzzlePiece;
+import bmv.org.pushca.captcha.service.CaptchaGenerator;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.*;
+
+import static bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorUtils.*;
 
 /**
  * Generator for creating puzzle images with complex, randomly curved shapes.
@@ -75,14 +63,14 @@ public class VisualSimilarityChallengeGenerator {
   private static final int MIN_TOTAL_MARGIN_FOR_BOTH_SIDES = 2 * MIN_MARGIN_SIZE; // Ensure both sides have minimum
 
   public SimilarityChallenge generateVisualSimilarityChallenge(int originSquareSideLength, int cellSideLength, int gridSize, Color color,
-                                                               boolean withNoise) {
+                                                                                         boolean withNoise) {
     return new SimilarityChallenge(
         generateFullPuzzleChallenge(originSquareSideLength, cellSideLength, gridSize, color, withNoise)
     );
   }
 
   public PuzzleChallenge generateFullPuzzleChallenge(int originSquareSideLength, int cellSideLength, int gridSize, Color color,
-                                                     boolean withNoise) {
+                                                                               boolean withNoise) {
     SimplePuzzlePiece puzzlePiece = drawComplexPuzzlePiece(originSquareSideLength, color);
 
     PuzzleGrid topPuzzleGrid = drawPuzzleGrid(

@@ -2,7 +2,7 @@ package bmv.org.pushca.captcha;
 
 import static bmv.org.pushca.captcha.service.CaptchaGenerator.bufferedImageToBytes;
 import static bmv.org.pushca.captcha.service.CaptchaGenerator.bytesToBufferedImage;
-import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.drawDashedRectangleOnGridImage;
+import static bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorUtils.drawDashedRectangleOnGridImage;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 

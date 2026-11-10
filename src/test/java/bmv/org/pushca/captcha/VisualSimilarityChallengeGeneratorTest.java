@@ -4,19 +4,19 @@ import static bmv.org.pushca.captcha.DynamicCaptchaApplicationTests.fileSystemCl
 import static bmv.org.pushca.captcha.DynamicCaptchaApplicationTests.saveBytesToFile;
 import static bmv.org.pushca.captcha.service.CaptchaGenerator.bufferedImageToBytes;
 import static bmv.org.pushca.captcha.service.CaptchaGenerator.bytesToBufferedImage;
-import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.drawDashedRectangleOnGridImage;
-import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomColor;
+import static bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorUtils.drawDashedRectangleOnGridImage;
+import static bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorUtils.generateRandomColor;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.image.BufferedImage;
 
-import bmv.org.pushca.captcha.service.VisualSimilarityChallengeGenerator;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.BinaryPuzzlePiece;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleChallenge;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Rectangle;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.SimilarityChallenge;
+import bmv.org.pushca.captcha.service.similarity.VisualSimilarityChallengeGenerator;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.BinaryPuzzlePiece;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.PuzzleChallenge;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.Rectangle;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.SimilarityChallenge;
 import org.junit.jupiter.api.Test;
 
 public class VisualSimilarityChallengeGeneratorTest {

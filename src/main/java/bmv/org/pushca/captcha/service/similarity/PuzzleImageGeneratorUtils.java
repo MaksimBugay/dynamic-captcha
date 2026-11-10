@@ -1,4 +1,4 @@
-package bmv.org.pushca.captcha.util;
+package bmv.org.pushca.captcha.service.similarity;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -12,8 +12,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import bmv.org.pushca.captcha.service.CaptchaGenerator;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Rectangle;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.Rectangle;
 
 /**
  * Utility class for generating and manipulating puzzle images.

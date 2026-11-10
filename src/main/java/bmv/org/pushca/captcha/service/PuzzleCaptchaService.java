@@ -6,8 +6,8 @@ import com.fasterxml.uuid.Generators;
 import com.fasterxml.uuid.impl.TimeBasedEpochGenerator;
 import java.util.UUID;
 
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleTaskFullData;
-import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Rectangle;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.PuzzleTaskFullData;
+import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.Rectangle;
 import org.springframework.stereotype.Service;
 
 @Service
