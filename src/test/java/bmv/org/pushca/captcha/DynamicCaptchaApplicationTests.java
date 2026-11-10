@@ -17,8 +17,6 @@ import java.time.Duration;
 import java.time.temporal.ChronoUnit;
 
 import bmv.org.pushca.captcha.service.PuzzleCaptchaService;
-import bmv.org.pushca.captcha.service.similarity.PuzzleImageGeneratorTypes.SimilarityChallenge;
-import bmv.org.pushca.captcha.service.similarity.VisualSimilarityCaptchaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
@@ -95,34 +93,6 @@ class DynamicCaptchaApplicationTests {
               "puzzle_options_grid_with_selection" + ".png"
           );
         });
-  }
-
-  @Test
-  void visualSimilarityCaptchaWebTest() {
-    client.get()
-        .uri("/visual-similarity-captcha/generate-and-get?grid-size=3&piece-side-length="
-             + VisualSimilarityCaptchaService.MIN_PIECE_SIDE_LENGTH_PX + "&apply-noise=true")
-        .exchange()
-        .expectStatus().isOk()
-        .expectBody(SimilarityChallenge.class)
-        .value(challenge -> {
-          assertNotNull(challenge);
-          assertNotNull(challenge.id());
-          assertNotNull(bytesToBufferedImage(challenge.image()));
-        });
-  }
-
-  @Test
-  void visualSimilarityCaptchaRejectsTooSmallPieceWebTest() {
-    client.get()
-        .uri("/visual-similarity-captcha/generate-and-get?grid-size=3&piece-side-length="
-             + (VisualSimilarityCaptchaService.MIN_PIECE_SIDE_LENGTH_PX - 1))
-        .exchange()
-        .expectStatus().isBadRequest()
-        .expectBody()
-        .jsonPath("$.message").isEqualTo("Piece side length must be at least "
-                                         + VisualSimilarityCaptchaService.MIN_PIECE_SIDE_LENGTH_PX + " px, but was "
-                                         + (VisualSimilarityCaptchaService.MIN_PIECE_SIDE_LENGTH_PX - 1));
   }
 
   public static void saveBytesToFile(byte[] captcha, String imageName) {

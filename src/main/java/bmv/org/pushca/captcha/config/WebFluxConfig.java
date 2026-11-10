@@ -18,7 +18,7 @@ import tools.jackson.databind.json.JsonMapper;
 @EnableWebFlux
 public class WebFluxConfig implements WebFluxConfigurer {
 
-  private static final int CAPTCHA_GENERATION_QUEUE_CAPACITY = 1000;
+  private static final int CAPTCHA_GENERATION_QUEUED_TASKS_PER_THREAD = 1000;
 
   @Bean
   public HttpResources httpResources() {
@@ -34,13 +34,14 @@ public class WebFluxConfig implements WebFluxConfigurer {
 
   /**
    * Captcha image generation is CPU-bound and blocking, so it runs here instead of on the Netty event loop.
-   * One thread per core; once the queue is full new requests are rejected rather than piling up.
+   * One thread per core. The queue limit applies per thread, so up to cores x 1000 requests can wait; beyond that
+   * new requests are rejected (503) rather than piling up.
    */
   @Bean(destroyMethod = "dispose")
   public Scheduler captchaGenerationScheduler() {
     return Schedulers.newBoundedElastic(
         Runtime.getRuntime().availableProcessors(),
-        CAPTCHA_GENERATION_QUEUE_CAPACITY,
+        CAPTCHA_GENERATION_QUEUED_TASKS_PER_THREAD,
         "captcha-generation"
     );
   }
