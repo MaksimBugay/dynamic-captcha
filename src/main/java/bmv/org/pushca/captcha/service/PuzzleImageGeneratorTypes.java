@@ -1,7 +1,6 @@
 package bmv.org.pushca.captcha.service;
 
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.bufferedImageToBytes;
-import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.extractArea;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.scaleBufferedImage;
 
 import java.awt.image.BufferedImage;
@@ -48,12 +47,12 @@ public class PuzzleImageGeneratorTypes {
       this(
           composedPuzzleGrid.topMatchedPiece().origin(),
           new SimplePuzzlePiece(
-              composedPuzzleGrid.topMatchedPiece().origin.area(),
-              extractArea(composedPuzzleGrid.image(), composedPuzzleGrid.topMatchedPiece().origin.area())
+              composedPuzzleGrid.topMatchedPiece().origin().area(),
+              composedPuzzleGrid.topMatchedPiece().origin().image()
           ),
           new SimplePuzzlePiece(
-              composedPuzzleGrid.bottomMatchedPiece().origin.area(),
-              extractArea(composedPuzzleGrid.image(), composedPuzzleGrid.bottomMatchedPiece().origin.area())
+              composedPuzzleGrid.bottomMatchedPiece().origin().area(),
+              composedPuzzleGrid.bottomMatchedPiece().origin().image()
           ),
           composedPuzzleGrid.image
       );

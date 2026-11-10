@@ -1,6 +1,6 @@
 # Use a multi-stage build to reduce the final image size
 # Stage 1: Build the application
-FROM maven:3.9.9-ibm-semeru-23-jammy AS build
+FROM maven:3.9-eclipse-temurin-25 AS build
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -15,7 +15,7 @@ RUN mvn clean package -DskipTests
 
 # Stage 2: Create the final image
 # Use the Eclipse Temurin base image (non-Alpine)
-FROM eclipse-temurin:23-jre
+FROM eclipse-temurin:25-jre
 
 # Install curl for health check
 RUN apt-get update && apt-get install -y curl && apt-get clean

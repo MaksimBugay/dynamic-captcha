@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>3.4.2</version>
+    <version>4.1.2</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>bmv.org.pushca</groupId>
@@ -28,20 +28,10 @@
     <url/>
   </scm>
   <properties>
-    <java.version>17</java.version>
-    <fasterxml.jackson.version>2.18.2</fasterxml.jackson.version>
+    <java.version>25</java.version>
+    <java-uuid-generator.version>5.2.0</java-uuid-generator.version>
+    <twelvemonkeys.version>3.15.3</twelvemonkeys.version>
   </properties>
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>com.fasterxml.jackson</groupId>
-        <artifactId>jackson-bom</artifactId>
-        <version>${fasterxml.jackson.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -52,57 +42,32 @@
       <artifactId>spring-boot-starter-webflux</artifactId>
     </dependency>
 
+    <!-- Jackson 3 (tools.jackson) managed by Spring Boot; jdk8/jsr310/parameter-names are built into databind -->
     <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-databind</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-xml</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-jdk8</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.datatype</groupId>
-      <artifactId>jackson-datatype-jsr310</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.module</groupId>
-      <artifactId>jackson-module-parameter-names</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-annotations</artifactId>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jackson</artifactId>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
-      <version>5.1.0</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.github.penggle</groupId>
-      <artifactId>kaptcha</artifactId>
-      <version>2.3.2</version>
+      <version>${java-uuid-generator.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.twelvemonkeys.imageio</groupId>
       <artifactId>imageio-core</artifactId>
-      <version>3.12.0</version>
+      <version>${twelvemonkeys.version}</version>
     </dependency>
     <dependency>
       <groupId>com.twelvemonkeys.imageio</groupId>
       <artifactId>imageio-jpeg</artifactId>
-      <version>3.12.0</version>
+      <version>${twelvemonkeys.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-test</artifactId>
+      <artifactId>spring-boot-starter-webflux-test</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>

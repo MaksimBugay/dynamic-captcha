@@ -1,8 +1,9 @@
 package bmv.org.pushca.captcha.service;
 
 import static bmv.org.pushca.captcha.service.CaptchaGenerator.bufferedImageToBytes;
-import static bmv.org.pushca.captcha.service.CaptchaService.ID_GENERATOR;
 
+import com.fasterxml.uuid.Generators;
+import com.fasterxml.uuid.impl.TimeBasedEpochGenerator;
 import java.util.UUID;
 
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleTaskFullData;
@@ -11,6 +12,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class PuzzleCaptchaService {
+
+  public static final TimeBasedEpochGenerator ID_GENERATOR = Generators.timeBasedEpochGenerator();
 
   private final ComplexPuzzleImageGenerator generator = new ComplexPuzzleImageGenerator();
 

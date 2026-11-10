@@ -1,16 +1,16 @@
 package bmv.org.pushca.captcha.config;
 
 import bmv.org.pushca.captcha.serialization.json.JsonUtility;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.codec.ServerCodecConfigurer;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
-import org.springframework.http.codec.json.Jackson2JsonEncoder;
+import org.springframework.http.codec.json.JacksonJsonDecoder;
+import org.springframework.http.codec.json.JacksonJsonEncoder;
 import org.springframework.web.reactive.config.EnableWebFlux;
 import org.springframework.web.reactive.config.WebFluxConfigurer;
 import reactor.netty.http.HttpResources;
 import reactor.netty.resources.LoopResources;
+import tools.jackson.databind.json.JsonMapper;
 
 @Configuration
 @EnableWebFlux
@@ -29,15 +29,15 @@ public class WebFluxConfig implements WebFluxConfigurer {
   }
 
   @Bean
-  public ObjectMapper customObjectMapper() {
+  public JsonMapper customJsonMapper() {
     return JsonUtility.getSimpleMapper();
   }
 
   @Override
   public void configureHttpMessageCodecs(ServerCodecConfigurer configurer) {
-    ObjectMapper customObjectMapper = customObjectMapper();
+    JsonMapper customJsonMapper = customJsonMapper();
 
-    configurer.defaultCodecs().jackson2JsonEncoder(new Jackson2JsonEncoder(customObjectMapper));
-    configurer.defaultCodecs().jackson2JsonDecoder(new Jackson2JsonDecoder(customObjectMapper));
+    configurer.defaultCodecs().jacksonJsonEncoder(new JacksonJsonEncoder(customJsonMapper));
+    configurer.defaultCodecs().jacksonJsonDecoder(new JacksonJsonDecoder(customJsonMapper));
   }
 }

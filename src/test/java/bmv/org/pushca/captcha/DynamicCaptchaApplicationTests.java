@@ -2,16 +2,12 @@ package bmv.org.pushca.captcha;
 
 import static bmv.org.pushca.captcha.service.CaptchaGenerator.bufferedImageToBytes;
 import static bmv.org.pushca.captcha.service.CaptchaGenerator.bytesToBufferedImage;
-import static bmv.org.pushca.captcha.service.CaptchaService.CaptchaSet.toCaptchaSetBinaries;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.drawDashedRectangleOnGridImage;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 import bmv.org.pushca.captcha.config.WebFluxConfig;
 import bmv.org.pushca.captcha.serialization.json.JsonUtility;
-import bmv.org.pushca.captcha.service.CaptchaService;
-import bmv.org.pushca.captcha.service.CaptchaService.CaptchaSet;
-import bmv.org.pushca.captcha.service.CaptchaService.CaptchaSetBinaries;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -23,12 +19,11 @@ import java.time.temporal.ChronoUnit;
 import bmv.org.pushca.captcha.service.PuzzleCaptchaService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.http.codec.json.Jackson2JsonDecoder;
-import org.springframework.http.codec.json.Jackson2JsonEncoder;
+import org.springframework.http.codec.json.JacksonJsonDecoder;
+import org.springframework.http.codec.json.JacksonJsonEncoder;
 import org.springframework.http.codec.support.DefaultClientCodecConfigurer;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
@@ -43,25 +38,19 @@ class DynamicCaptchaApplicationTests {
   @LocalServerPort
   private String port;
 
-  @Autowired
-  private CaptchaService captchaService;
-
-  @Autowired
-  private PuzzleCaptchaService puzzleCaptchaService;
-
   protected WebTestClient client;
 
   @BeforeEach
   public void prepare() {
-    Jackson2JsonEncoder jsonEncoder = new Jackson2JsonEncoder(JsonUtility.getSimpleMapper());
-    Jackson2JsonDecoder jsonDecoder = new Jackson2JsonDecoder(JsonUtility.getSimpleMapper());
+    JacksonJsonEncoder jsonEncoder = new JacksonJsonEncoder(JsonUtility.getSimpleMapper());
+    JacksonJsonDecoder jsonDecoder = new JacksonJsonDecoder(JsonUtility.getSimpleMapper());
 
     ExchangeStrategies exchangeStrategies = ExchangeStrategies.builder()
         .codecs(clientCodecConfigurer -> {
           DefaultClientCodecConfigurer configurer =
               (DefaultClientCodecConfigurer) clientCodecConfigurer;
-          configurer.defaultCodecs().jackson2JsonEncoder(jsonEncoder);
-          configurer.defaultCodecs().jackson2JsonDecoder(jsonDecoder);
+          configurer.defaultCodecs().jacksonJsonEncoder(jsonEncoder);
+          configurer.defaultCodecs().jacksonJsonDecoder(jsonDecoder);
         })
         .build();
 
@@ -71,27 +60,6 @@ class DynamicCaptchaApplicationTests {
         .responseTimeout(Duration.of(1, ChronoUnit.MINUTES))
         .exchangeStrategies(exchangeStrategies)
         .build();
-  }
-
-  @Test
-  void captchaSetBinariesWebTest() {
-    client.get()
-        .uri("/dynamic-captcha/generate-and-get?with-strong=true")
-        .exchange()
-        .expectStatus().isOk()
-        .expectBody(CaptchaSet.class)
-        .value(captchaSet -> {
-          assertNotNull(captchaSet);
-          processCaptchaSet(captchaSet);
-        });
-  }
-
-  @Test
-  void captchaSetBinariesTest() {
-    CaptchaSet captchaSet = captchaService.generateCaptchaSet(true);
-    String json = JsonUtility.toJson(captchaSet);
-    captchaSet = JsonUtility.fromJson(json, CaptchaSet.class);
-    processCaptchaSet(captchaSet);
   }
 
   @Test
@@ -125,21 +93,6 @@ class DynamicCaptchaApplicationTests {
               "puzzle_options_grid_with_selection" + ".png"
           );
         });
-  }
-
-  private static void processCaptchaSet(CaptchaSet captchaSet) {
-    System.out.printf("x1 = %d; x2 = %d", captchaSet.x1(), captchaSet.x2());
-    System.out.println(" ");
-
-    byte[] payload = captchaSet.toPayloadBytes();
-    CaptchaSetBinaries binaries = toCaptchaSetBinaries(payload);
-    saveBytesToFile(binaries.captcha(), "captcha.png");
-    int i = -1;
-    for (byte[] result : binaries.results()) {
-      i++;
-      saveBytesToFile(result, "result" + i + ".jpg");
-    }
-    System.out.println("Result index = " + captchaSet.correctResultIndex());
   }
 
   public static void saveBytesToFile(byte[] captcha, String imageName) {

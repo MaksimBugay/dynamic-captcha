@@ -3,23 +3,61 @@ package bmv.org.pushca.captcha;
 import static bmv.org.pushca.captcha.DynamicCaptchaApplicationTests.fileSystemCleanup;
 import static bmv.org.pushca.captcha.DynamicCaptchaApplicationTests.saveBytesToFile;
 import static bmv.org.pushca.captcha.service.CaptchaGenerator.bufferedImageToBytes;
+import static bmv.org.pushca.captcha.service.CaptchaGenerator.bytesToBufferedImage;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.drawDashedRectangleOnGridImage;
 import static bmv.org.pushca.captcha.util.PuzzleImageGeneratorUtils.generateRandomColor;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.awt.image.BufferedImage;
 
 import bmv.org.pushca.captcha.service.VisualSimilarityChallengeGenerator;
+import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.BinaryPuzzlePiece;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.PuzzleChallenge;
+import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.Rectangle;
 import bmv.org.pushca.captcha.service.PuzzleImageGeneratorTypes.SimilarityChallenge;
+import org.junit.jupiter.api.Test;
 
-public class ComplexPuzzleImageGeneratorTest {
+public class VisualSimilarityChallengeGeneratorTest {
 
-  public static void main(String[] args) {
+  @Test
+  void generateVisualSimilarityChallengeProducesConsistentImages() {
+    VisualSimilarityChallengeGenerator generator = new VisualSimilarityChallengeGenerator();
+
+    SimilarityChallenge challenge = generator.generateVisualSimilarityChallenge(
+        100, 300, 2, generateRandomColor(), true
+    );
+
+    BufferedImage grid = bytesToBufferedImage(challenge.image());
+    assertNotNull(grid);
+    assertPieceMatchesImage(challenge.origin());
+    assertPieceMatchesImage(challenge.topMatchedPiece());
+    assertPieceMatchesImage(challenge.bottomMatchedPiece());
+    assertWithin(grid, challenge.topMatchedPiece().area());
+    assertWithin(grid, challenge.bottomMatchedPiece().area());
+    // Bottom grid is concatenated below the top one, so its match sits lower
+    assertTrue(challenge.bottomMatchedPiece().area().leftTopCorner().y()
+        > challenge.topMatchedPiece().area().leftTopCorner().y());
+  }
+
+  private static void assertPieceMatchesImage(BinaryPuzzlePiece piece) {
+    BufferedImage image = bytesToBufferedImage(piece.image());
+    assertNotNull(image);
+    assertEquals(piece.area().width(), image.getWidth());
+    assertEquals(piece.area().height(), image.getHeight());
+  }
+
+  private static void assertWithin(BufferedImage grid, Rectangle area) {
+    assertTrue(area.leftTopCorner().x() >= 0 && area.leftTopCorner().y() >= 0);
+    assertTrue(area.leftTopCorner().x() + area.width() <= grid.getWidth());
+    assertTrue(area.leftTopCorner().y() + area.height() <= grid.getHeight());
+  }
+
+  static void main() {
     fileSystemCleanup();
-    //ComplexPuzzleImageGenerator generator = new ComplexPuzzleImageGenerator();
     VisualSimilarityChallengeGenerator generator = new VisualSimilarityChallengeGenerator();
     int gridSize = 2; // Example grid size
-    //int squareSideLength = 400;
 
     for (int i = 0; i < 5; i++) {
       PuzzleChallenge puzzleChallenge = generator.generateFullPuzzleChallenge(
@@ -33,8 +71,6 @@ public class ComplexPuzzleImageGeneratorTest {
       SimilarityChallenge similarityChallenge = new SimilarityChallenge(
           puzzleChallenge
       );
-
-      //SimplePuzzlePiece puzzlePiece = generator.drawComplexPuzzlePiece(90, Color.BLUE);
 
       saveBytesToFile(
           similarityChallenge.origin().image(),
@@ -60,24 +96,6 @@ public class ComplexPuzzleImageGeneratorTest {
       ) {
         throw new RuntimeException("topMatchedPiece area is not equal to image size");
       }
-
-      /*BufferedImage puzzlePieceWithMarkedOrigin = drawDashedRectangleOnGridImage(obfuscatedPuzzlePiece.image(), obfuscatedPuzzlePiece.origin().area());
-      BufferedImage puzzlePieceWithMarkedOriginWithBorders = drawDashedRectangleOnGridImage(
-          puzzlePieceWithMarkedOrigin, new Rectangle(new Point(0, 0), obfuscatedPuzzlePiece.image().getWidth(), obfuscatedPuzzlePiece.image().getHeight()));
-      saveBytesToFile(
-          bufferedImageToBytes(puzzlePieceWithMarkedOriginWithBorders, "png"),
-          "puzzle_piece_with_selection" + ".png"
-      );*/
-
-      /*PuzzleGrid puzzleGrid1 = generator.drawPuzzleGrid(
-          puzzlePiece,
-          gridSize,
-          200,
-          Color.BLUE,
-          true
-      );
-      System.out.println(puzzleGrid1.matchedPiece().scaleCoefficient());
-      System.out.println(puzzleGrid1.matchedPiece().rotateAngle());*/
 
       saveBytesToFile(
           similarityChallenge.image(),
@@ -105,59 +123,12 @@ public class ComplexPuzzleImageGeneratorTest {
           "puzzle_grid_with_areas" + ".png"
       );
 
-      /*PuzzleGrid puzzleGrid2 = generator.drawPuzzleGrid(
-          puzzlePiece,
-          gridSize,
-          200,
-          Color.BLUE,
-          false
-      );
-      System.out.println(puzzleGrid2.matchedPiece().scaleCoefficient());
-      System.out.println(puzzleGrid2.matchedPiece().rotateAngle());
-      if (withSectors) {
-        BufferedImage puzzleGridWithMarkedOrigin2 = drawDashedRectangleOnGridImage(
-            puzzleGrid2.image(),
-            puzzleGrid2.matchedPiece().origin().area()
-        );
-        BufferedImage puzzleGridWithMarkedOrigin2a = drawDashedRectangleOnGridImage(
-            puzzleGridWithMarkedOrigin2,
-            puzzleGrid2.matchedPiece().area()
-        );
-        saveBytesToFile(
-            bufferedImageToBytes(puzzleGridWithMarkedOrigin2a, "png"),
-            "puzzle_grid2" + ".png"
-        );
-      } else {
-        saveBytesToFile(
-            bufferedImageToBytes(puzzleGrid2.image(), "png"),
-            "puzzle_grid2" + ".png"
-        );
-      }*/
+
       try {
         Thread.sleep(2000);
       } catch (InterruptedException e) {
         Thread.currentThread().interrupt();
       }
     }
-
-    /*PuzzleTaskFullData fullData = generator.generatePuzzleTaskFullData(squareSideLength, gridSize, true);
-    saveBytesToFile(
-        bufferedImageToBytes(fullData.puzzleGridImage(), "png"),
-        "full_puzzle_board" + ".png"
-    );*/
-
-    /*saveBytesToFile(
-        bufferedImageToBytes(fullData.getCorrectOption().image(), "png"),
-        "correct_option" + ".png"
-    );*/
-
-    /*BufferedImage gridWithSelection = generator.drawDashedRectangleOnGridImage(fullData.puzzleGridImage(), fullData.getCorrectOption().rectangle());
-    fullData = new PuzzleTaskFullData(fullData.options(), fullData.target(), gridWithSelection, fullData.scaleCoefficient());
-
-    BufferedImage gridWithTwoSelections = generator.drawDashedRectangleOnGridImage(fullData.puzzleGridImage(), fullData.target().rectangle());
-    saveBytesToFile(
-        bufferedImageToBytes(gridWithTwoSelections, "png"),
-        "puzzle_options_grid_with_selection" + ".png"
-    );*/
   }
 }

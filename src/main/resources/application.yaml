@@ -1,3 +1,5 @@
+
+
 spring:
   application:
     name: dynamic-captcha
@@ -15,3 +17,6 @@ management:
 logging:
   level:
     root: INFO
+
+server:
+  port: 8061
