@@ -26,7 +26,9 @@ WORKDIR /app
 # Copy the built jar file from the build stage
 COPY --from=build /app/target/*.jar app.jar
 
-# Expose the port the application will run on
+# Port the application listens on inside the container. Overrides server.port from the bundled application.yaml
+# (8061, for running locally), so the health check and the stack's port mapping keep working.
+ENV SERVER_PORT=8080
 EXPOSE 8080
 
 # Set environment variables for better performance and SecureRandom configuration
@@ -40,7 +42,7 @@ ENV JAVA_OPTS="\
 
 # Add a health check using the Actuator health endpoint
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:8080/actuator/health || exit 1
+  CMD curl -f http://localhost:${SERVER_PORT}/actuator/health || exit 1
 
 # Run the application
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]
